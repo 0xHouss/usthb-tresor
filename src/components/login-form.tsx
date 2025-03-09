@@ -5,8 +5,7 @@ import { signIn } from "next-auth/react"
 import Image from "next/image"
 import Link from "next/link"
 
-export function LoginForm({
-}: React.ComponentPropsWithoutRef<"form">) {
+export function LoginForm(props: React.ComponentPropsWithoutRef<"form">) {
     return (
         <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
             <div className="flex flex-col space-y-2 text-center">
