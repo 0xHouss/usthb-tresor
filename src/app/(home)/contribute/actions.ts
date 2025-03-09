@@ -84,6 +84,7 @@ export async function uploadFile(state: FormState, formData: FormData): Promise<
                 url: fileUrl,
                 uploadedBy: { connect: { email: user.email! } },
                 ...metadata,
+                status: 'APPROVED', // TODO: Change to PENDING
             }
         })
 

@@ -15,7 +15,7 @@ datasource db {
 
 enum UserRole {
     USER
-    DELEGATE
+    MODERATOR
     ADMIN
 }
 
@@ -30,8 +30,14 @@ model User {
     files File[]
 }
 
+enum FileStatus {
+    PENDING
+    APPROVED
+    REJECTED
+}
+
 model File {
-    id           String   @id
+    id           String  @id
     type         String
     speciality   String
     academicYear String
@@ -42,7 +48,9 @@ model File {
     module       String
     professor    String
     url          String
-    uploadedAt   DateTime @default(now())
+
+    status     FileStatus @default(PENDING)
+    uploadedAt DateTime   @default(now())
 
     uploadedBy      User   @relation(fields: [uploadedByEmail], references: [email])
     uploadedByEmail String
