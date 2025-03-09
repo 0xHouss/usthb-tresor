@@ -1,7 +1,8 @@
-import { getDriveFiles } from "./actions";
+import Link from "next/link";
+import { getFiles } from "./actions";
 
 export default async function DriveFilesPage() {
-    const files = await getDriveFiles();
+    const files = await getFiles();
 
     return (
         <div className="p-4">
@@ -13,18 +14,15 @@ export default async function DriveFilesPage() {
                 <ul className="border rounded-lg p-4">
                     {files.map((file) => (
                         <li key={file.id} className="mb-2 border-b pb-2">
-                            <p className="font-medium">{file.name}</p>
-                            <p className="text-sm text-gray-500">{file.mimeType}</p>
-                            {file.webViewLink && (
-                                <a
-                                    href={file.webViewLink}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="text-blue-500 hover:underline"
-                                >
-                                    View File
-                                </a>
-                            )}
+                            <p className="font-medium">{file.module}</p>
+                            <Link
+                                href={file.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-blue-500 hover:underline"
+                            >
+                                View File
+                            </Link>
                         </li>
                     ))}
                 </ul>
