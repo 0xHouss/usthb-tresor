@@ -1,6 +1,7 @@
 "use server";
 
 import { drive } from "@/lib/google-drive";
+import { prisma } from "@/lib/prisma";
 import { getUserSession } from "@/lib/session";
 import { FormState, fromErrorToFormState, toFormState } from "@/lib/to-form-state";
 import fs from "fs";
@@ -8,7 +9,7 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
 const UploadFormSchema = z.object({
-    program: z.string(),
+    speciality: z.string(),
     academicYear: z.string(),
     section: z.string(),
     group: z.string(),
@@ -33,7 +34,7 @@ export async function uploadFile(state: FormState, formData: FormData): Promise<
             throw new Error('Only PDF files are allowed.');
 
         const metadata = UploadFormSchema.parse({
-            program: formData.get('program'),
+            speciality: formData.get('speciality'),
             academicYear: formData.get('academicYear'),
             section: formData.get('section'),
             group: formData.get('group'),
@@ -52,7 +53,7 @@ export async function uploadFile(state: FormState, formData: FormData): Promise<
         // Upload file to Google Drive
         const fileUploadResponse = await drive.files.create({
             requestBody: {
-                name: `${metadata.type} - ${metadata.module} - ${metadata.program} - ${metadata.academicYear} - ${metadata.semester} - ${metadata.section} - ${metadata.group} - ${metadata.schoolYear}.pdf`,
+                name: `${metadata.type} - ${metadata.module} - ${metadata.speciality} - ${metadata.academicYear} - ${metadata.semester} - ${metadata.section} - ${metadata.group} - ${metadata.schoolYear}.pdf`,
                 parents: ['1KYAYbyYJhCtjhTCz7j3XUr2UBG0uNuw4']
             },
             media: {
@@ -75,14 +76,16 @@ export async function uploadFile(state: FormState, formData: FormData): Promise<
             },
         });
 
-        // Get the public link
-        const { data } = await drive.files.get({
-            fileId,
-            fields: "webViewLink",
-        });
+        const fileUrl = `https://drive.google.com/file/d/${fileId}/view?usp=sharing`;
 
-        const fileUrl = data.webViewLink;
-        if (!fileUrl) throw new Error("Failed to get file URL.");
+        await prisma.file.create({
+            data: {
+                id: fileId,
+                url: fileUrl,
+                uploadedBy: { connect: { email: user.email! } },
+                ...metadata,
+            }
+        })
 
         fs.unlinkSync(tempPath);
         revalidatePath("/contribute");
