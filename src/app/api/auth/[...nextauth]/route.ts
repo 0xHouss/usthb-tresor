@@ -1,9 +1,9 @@
 import ENV from "@/lib/env"
 import { prisma } from "@/lib/prisma"
 import NextAuth, { NextAuthOptions } from "next-auth"
-import GoogleProvider from "next-auth/providers/google"
+import GoogleProvider, { GoogleProfile } from "next-auth/providers/google"
 
-const authOptions: NextAuthOptions = {
+export const authOptions: NextAuthOptions = {
     secret: ENV.NEXTAUTH_SECRET,
     session: {
         strategy: "jwt",
@@ -15,22 +15,28 @@ const authOptions: NextAuthOptions = {
         }),
     ],
     callbacks: {
-        async signIn({ profile }) {
+        async signIn({ profile: prf }) {
+            const profile = prf as GoogleProfile
+
             if (!profile?.email)
                 throw new Error("No profile !")
 
             await prisma.user.upsert({
                 where: { email: profile.email },
-                update: { name: profile.name },
+                update: {
+                    name: profile.name,
+                    avatar: profile.picture,
+                },
                 create: {
                     email: profile.email,
                     name: profile.name,
+                    avatar: profile.picture,
                 },
             })
 
             return true
         },
-        async session({ token, session}) {
+        async session({ token, session }) {
             if (token) {
                 session.user.name = token.name
                 session.user.email = token.email

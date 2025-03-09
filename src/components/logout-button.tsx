@@ -1,12 +1,10 @@
 'use client'
 
 import { signOut } from "next-auth/react";
-import { Button } from "./ui/button";
+import { DropdownMenuItem } from "./ui/dropdown-menu";
 
-export function LogoutButton() {
+export function LogoutDropdownMenuItem() {
     return (
-        <Button variant="destructive" onClick={() => signOut({ callbackUrl: '/' })}>
-            Logout
-        </Button>
+        <DropdownMenuItem className="text-destructive focus:text-destructive" onClick={() => signOut({ callbackUrl: '/' })}>Log out</DropdownMenuItem>
     )
 }
