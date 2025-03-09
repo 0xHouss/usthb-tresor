@@ -25,34 +25,24 @@ export default function ContributePage() {
             <form className="space-y-4" action={action}>
                 <div className="grid grid-cols-2 gap-4">
                     <div>
-                        <Label>Program / Specialization</Label>
-                        <Input placeholder="e.g., Computer Science" name="program" id="program" />
+                        <Label>Speciality</Label>
+                        <Input placeholder="e.g., Computer Science" name="speciality" id="speciality" />
                     </div>
                     <div>
                         <Label>Academic Year</Label>
-                        <Select required onValueChange={(value) => setAcademicYear(value)}>
-                            <SelectTrigger>
-                                <input type="text" hidden id="academicYear" name="academicYear" value={academicYear} readOnly/>
-                                <SelectValue placeholder="Select Year" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="L1">L1</SelectItem>
-                                <SelectItem value="L2">L2</SelectItem>
-                                <SelectItem value="M1">M1</SelectItem>
-                            </SelectContent>
-                        </Select>
+                        <Input placeholder="e.g., L1" name="academicYear" id="academicYear" />
                     </div>
                     <div>
                         <Label>Section</Label>
-                        <Input placeholder="e.g., D" name="section" id="section" />
+                        <Input placeholder="e.g., A" name="section" id="section" />
                     </div>
                     <div>
                         <Label>Group (Optional)</Label>
-                        <Input placeholder="e.g., 3" name="group" id="group" />
+                        <Input placeholder="e.g., 1" name="group" id="group" />
                     </div>
                     <div>
                         <Label>School Year</Label>
-                        <Input placeholder="e.g., 2023/2024" name="schoolYear" id="schoolYear" />
+                        <Input placeholder="e.g., 2024/2025" name="schoolYear" id="schoolYear" />
                     </div>
                     <div>
                         <Label>Semester</Label>
@@ -69,24 +59,23 @@ export default function ContributePage() {
                     </div>
                     <div>
                         <Label>Module</Label>
-                        <Input placeholder="e.g., Mathematics" name="module" id="module" />
+                        <Input placeholder="e.g., Analysis 1" name="module" id="module" />
                     </div>
                     <div>
                         <Label>Professor</Label>
-                        <Input placeholder="e.g., Dr. Smith" name="professor" id="professor" />
+                        <Input placeholder="e.g., John Doe" name="professor" id="professor" />
                     </div>
                     <div className="col-span-2">
                         <Label>Resource Type</Label>
                         <Select required onValueChange={(value) => setRessourceType(value)}>
                             <SelectTrigger>
-                                <input type="text" hidden id="type" name="type" value={ressourceType} readOnly/>
+                                <input type="text" hidden id="type" name="type" value={ressourceType} readOnly />
                                 <SelectValue placeholder="Select Type" />
                             </SelectTrigger>
                             <SelectContent>
                                 <SelectItem value="Exam">Exam</SelectItem>
                                 <SelectItem value="Interro">Interro</SelectItem>
-                                <SelectItem value="TD">TD</SelectItem>
-                                <SelectItem value="TP">TP</SelectItem>
+                                <SelectItem value="Worksheet">Worksheet</SelectItem>
                                 <SelectItem value="Lecture">Lecture</SelectItem>
                             </SelectContent>
                         </Select>
