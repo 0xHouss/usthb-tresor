@@ -11,14 +11,14 @@ export default function LoginPage() {
                 <Image
                     src="/banner.jpeg"
                     alt="Image"
-                    height={1000}
                     width={500}
-                    className="absolute  h-full w-full object-cover"
+                    height={1000}
+                    className="absolute inset-0 h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
                 />
             </div>
             <div className="flex flex-col gap-4 p-6 md:p-10">
                 <div className="flex justify-between items-center gap-2">
-                    <Link href="/" className="flex items-center gap-2 font-semibold">
+                    <Link href="/" className="flex items-center gap-2 font-semibold ">
                         <Image
                             src="/usthb-logo.png"
                             alt="Logo"
@@ -26,7 +26,9 @@ export default function LoginPage() {
                             width={42}
 
                         />
-                        USTHB Trésor
+                        <span className="leading-4">
+                            USTHB<br />TRÉSOR
+                        </span>
                     </Link>
                     <ThemeToggle />
                 </div>
