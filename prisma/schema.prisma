@@ -5,25 +5,49 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client-js"
+    provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = "file:./dev.db"
+    provider = "sqlite"
+    url      = "file:./dev.db"
 }
 
 enum UserRole {
-  USER
-  DELEGATE
-  ADMIN
+    USER
+    DELEGATE
+    ADMIN
 }
 
 model User {
-  email     String   @id
-  name      String?
-  avatar    String?
-  role      UserRole @default(USER)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-} 
+    email     String   @id
+    name      String?
+    avatar    String?
+    role      UserRole @default(USER)
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    files     File[]   // One-to-many relationship
+}
+
+model File {
+    id           String  @id
+    googleId     String  @unique
+    name         String
+    type         String
+    program      String
+    academicYear String
+    section      String
+    group        String?
+    schoolYear   String
+    semester     Int
+    module       String
+    professor    String
+    url          String
+    uploadedAt   DateTime @default(now())
+
+    uploadedBy   User    @relation(fields: [uploadedByEmail], references: [email])
+    uploadedByEmail String
+}
+
+
