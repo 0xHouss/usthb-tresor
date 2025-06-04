@@ -1,57 +1,96 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
 
 generator client {
-    provider = "prisma-client-js"
-}
-
-datasource db {
-    provider = "sqlite"
-    url      = "file:./dev.db"
-}
-
-enum UserRole {
-    USER
-    MODERATOR
-    ADMIN
+  provider = "prisma-client-js"
 }
 
 model User {
-    email     String   @id
-    name      String?
-    avatar    String?
-    role      UserRole @default(USER)
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+  id            String          @id @default(cuid())
+  name          String?
+  email         String         @unique
+  emailVerified DateTime?
+  image         String?
+  accounts      Account[]
+  sessions      Session[]
 
-    files File[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  File File[]
 }
 
-enum FileStatus {
-    PENDING
-    APPROVED
-    REJECTED
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model VerificationToken {
+  identifier String
+  token      String
+  expires    DateTime
+
+  @@unique([identifier, token])
 }
 
 model File {
-    id           String  @id
-    type         String
-    speciality   String
-    academicYear String
-    section      String
-    group        String?
-    schoolYear   String
-    semester     Int
-    module       String
-    professor    String
-    url          String
+  id           String  @id
+  type         String
+  speciality   String
+  academicYear String
+  section      String
+  group        String?
+  schoolYear   String
+  semester     Int
+  module       String
+  professor    String
+  url          String
 
-    status     FileStatus @default(PENDING)
-    uploadedAt DateTime   @default(now())
+  status     FileStatus @default(APPROVED) // TODO: Change to PENDING
+  uploadedAt DateTime   @default(now())
 
-    uploadedBy      User   @relation(fields: [uploadedByEmail], references: [email])
-    uploadedByEmail String
+  uploadedBy      User   @relation(fields: [uploadedByEmail], references: [email])
+  uploadedByEmail String
+}
+
+enum UserRole {
+  USER
+  MODERATOR
+  ADMIN
+}
+
+enum FileStatus {
+  PENDING
+  APPROVED
+  REJECTED
 }
