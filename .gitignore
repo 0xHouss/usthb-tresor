@@ -44,5 +44,6 @@ next-env.d.ts
 prisma/dev.db-journal
 prisma/dev.db
 
-# google cloud
-google-service-account.json
+# google drive
+credentials.json
+token.json
