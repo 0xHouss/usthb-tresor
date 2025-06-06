@@ -1,3 +1,4 @@
+import { login } from "@/actions/auth-actions"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { Button } from "@/components/ui/button"
 import { signIn } from "@/lib/auth"
@@ -46,11 +47,7 @@ export default function LoginPage() {
               <Button
                 variant="outline"
                 type="button"
-                onClick={async () => {
-                  "use server"
-
-                  await signIn('google', { redirectTo: '/' })
-                }}
+                onClick={login}
               >
                 <Image
                   src="/google-icon.svg"
