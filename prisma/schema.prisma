@@ -7,13 +7,20 @@ generator client {
   provider = "prisma-client-js"
 }
 
+// Auth models and enums
+
+enum UserRole {
+  User
+  Moderator
+  Admin
+}
 model User {
   id            String    @id @default(cuid())
   name          String?
   email         String    @unique
   emailVerified DateTime?
   image         String?
-  role          UserRole  @default(USER)
+  role          UserRole  @default(User)
   accounts      Account[]
   sessions      Session[]
 
@@ -64,34 +71,84 @@ model VerificationToken {
   @@unique([identifier, token])
 }
 
-model File {
-  id           String  @id
-  type         String
-  speciality   String
-  academicYear String
-  section      String
-  group        String?
-  schoolYear   String
-  semester     Int
-  module       String
-  professor    String
-  url          String
+// File model and enums
 
-  status     FileStatus @default(APPROVED) // TODO: Change to PENDING
+enum FileStatus {
+  Pending
+  Approved
+  Rejected
+}
+
+enum FileType {
+  Lecture
+  DW_Worksheet
+  PW_Worksheet
+  Interrogation
+  Exam
+  PW_Exam
+}
+
+enum AcademicLevel {
+  L1
+  L2
+  L3
+  M1
+  M2
+  D1
+  D2
+  D3
+  ING1
+  ING2
+  ING3
+  ING4
+  ING5
+}
+
+enum Semester {
+  S1
+  S2
+}
+model File {
+  id            String        @id
+  type          FileType
+  
+  academicLevel AcademicLevel
+  academicYear  Int
+  semester      Semester
+  section       String
+  group         String?
+
+  major         Major @relation(fields: [majorName], references: [name])
+  majorName     String
+  
+  module        Module @relation(fields: [moduleName], references: [name])
+  moduleName    String
+
+  professor     Professor @relation(fields: [professorFullName], references: [fullName])
+  professorFullName String
+
+  status     FileStatus @default(Approved) // TODO: Change to Pending in production
   uploadedAt DateTime   @default(now())
 
   uploadedBy      User   @relation(fields: [uploadedByEmail], references: [email])
   uploadedByEmail String
 }
 
-enum UserRole {
-  USER
-  MODERATOR
-  ADMIN
+model Professor {
+  fullName String @id
+
+  File File[]
 }
 
-enum FileStatus {
-  PENDING
-  APPROVED
-  REJECTED
+model Module {
+  name String @id
+
+  File File[]
 }
+
+model Major {
+  name String @id
+
+  File File[]
+}
+
