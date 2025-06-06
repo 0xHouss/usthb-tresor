@@ -1,9 +1,8 @@
-import { User } from 'next-auth'
-import React from 'react'
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from './ui/dropdown-menu'
-import Image from 'next/image'
+import { logout } from '@/actions/auth-actions'
 import { getInitials } from '@/lib/utils'
-import { signOut } from '@/lib/auth'
+import { User } from 'next-auth'
+import Image from 'next/image'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from './ui/dropdown-menu'
 
 interface UserDropdownProps {
   user: User
@@ -27,15 +26,8 @@ export default function UserDropdown({ user }: UserDropdownProps) {
           <p className="truncate text-muted-foreground">{user.email}</p>
         </div>
         <DropdownMenuSeparator />
-        {user.role === "ADMIN" && (
-          <DropdownMenuItem>Dashboard</DropdownMenuItem>
-        )}
         <DropdownMenuItem>Settings</DropdownMenuItem>
-        <DropdownMenuItem className="text-destructive focus:text-destructive" onClick={async () => {
-          "use server"
-
-          await signOut({ redirectTo: '/login' })
-        }}>Log out</DropdownMenuItem>
+        <DropdownMenuItem className="text-destructive focus:text-destructive" onClick={logout}>Log out</DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   )
