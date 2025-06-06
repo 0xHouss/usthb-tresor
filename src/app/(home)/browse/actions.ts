@@ -1,49 +1,32 @@
 import { prisma } from "@/lib/prisma";
+import { ParsedSearchParams } from "./page";
+import { FileStatus } from "@prisma/client";
 
-export interface SearchParams {
-  page: number;
-  professor?: string;
-  module?: string;
-  schoolYear?: string;
-  academicYear?: string;
-  semester?: number;
-  type?: string;
-  section?: string;
-  group?: string;
-  speciality?: string;
-  search?: string;
-}
+export const pageSize = 12;
 
-export const pageSize = 10;
-
-export async function getFiles({ page, academicYear, module, speciality, professor, schoolYear, search, semester, type, group, section }: SearchParams) {
+export async function getFiles({ academicLevels, modules, majors, professors, startYear, endYear,  semester, types, group, section }: ParsedSearchParams) {
   const files = prisma.file.findMany({
     where: {
-      status: "APPROVED",
-      module: { equals: module },
-      professor: { equals: professor },
-      schoolYear: { equals: schoolYear },
-      academicYear: { equals: academicYear },
-      semester: { equals: semester },
-      speciality: { equals: speciality },
-      type: { equals: type },
+      status: FileStatus.Approved,
+      moduleName: modules?.length ? { in: modules } : undefined,
+      professorFullName: professors?.length ? { in: professors } : undefined,
+      academicLevel: academicLevels?.length ? { in: academicLevels } : undefined,
+      semester: semester ? { equals: semester } : undefined,
+      type: types?.length ? { in: types } : undefined,
+      majorName: majors?.length ? { in: majors } : undefined,
+      academicYear: {
+        gte: startYear ? startYear : undefined,
+        lte: endYear ? endYear : undefined,
+      },
       section: { equals: section },
       group: { equals: group },
-      OR: [
-        { module: { contains: search } },
-        { professor: { contains: search } },
-        { type: { contains: search } },
-        { schoolYear: { contains: search } },
-        { academicYear: { contains: search } },
-        { speciality: { contains: search } },
-        { section: { contains: search } },
-        { group: { contains: search } },
-      ],
     },
-    skip: (page - 1) * pageSize,
     take: pageSize,
   });
 
   return files;
 }
 
+export const getMajors = async () => prisma.major.findMany();
+export const getProfessors = async () => prisma.professor.findMany();
+export const getModules = async () => prisma.module.findMany();

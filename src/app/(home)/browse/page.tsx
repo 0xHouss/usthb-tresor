@@ -1,100 +1,155 @@
+import { FileFilterSidebar } from "@/components/file-filter-sidebar";
+import NoDataIllustration from "@/components/svg/no-data";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
-import { Eye } from "lucide-react";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { getFileDownloadUrl, getFileUrl, isEnumValue } from "@/lib/utils";
+import { AcademicLevel, FileType, Semester } from "@prisma/client";
+import { DownloadIcon } from "lucide-react";
 import Link from "next/link";
-import { getFiles } from "./actions";
-import SearchBar from "./search-bar";
+import { getFiles, getMajors, getModules, getProfessors } from "./actions";
 
-type Params = Promise<{ slug: string }>
+// if (semester) params.set("semester", semester);
+// if (selectedMajors.length) params.set("majors", selectedMajors.join(","));
+// if (section) params.set("section", section);
+// if (group) params.set("group", group);
+// if (startYear) params.set("startYear", startYear.toString());
+// if (endYear) params.set("endYear", endYear.toString());
+// if (selectedLevels.length) params.set("academicLevels", selectedLevels.join(","));
+// if (selectedProfessors.length) params.set("professors", selectedProfessors.join(","));
+// if (selectedTypes.length) params.set("types", selectedTypes.join(","));
+// if (selectedModules.length) params.set("modules", selectedModules.join(","));
 
 export type SearchParams = Promise<{
-  search?: string;
-  professor?: string;
-  module?: string;
-  schoolYear?: string;
-  academicYear?: string;
   semester?: string;
+  majors?: string;
   section?: string;
   group?: string;
-  speciality?: string;
-  type?: string;
-  page?: number;
+  startYear?: string;
+  endYear?: string;
+  academicLevels?: string;
+  professors?: string;
+  types?: string;
+  modules?: string;
 } & URLSearchParams>
 
-export default async function DriveFilesPage(props: { params: Params, searchParams: SearchParams }) {
-  const searchParams = await props.searchParams
-  const params = await props.params
+async function parseSearchParams(params: SearchParams) {
+  const { academicLevels, semester, majors, section, group, startYear, endYear, professors, modules, types } = await params;
 
-  console.log(searchParams);
+  const parsedParams = {
+    semester: semester ? isEnumValue(Semester, semester) ? semester : undefined : undefined,
+    majors: majors?.length ? majors.split(",") : undefined,
+    section,
+    group,
+    startYear: startYear ? parseInt(startYear) : undefined,
+    endYear: endYear ? parseInt(endYear) : undefined,
+    academicLevels: academicLevels?.length ? academicLevels.split(",").filter(l => isEnumValue(AcademicLevel, l)) : undefined,
+    professors: professors?.length ? professors.split(",") : undefined,
+    types: types?.length ? types.split(",").filter(t => isEnumValue(FileType, t)) : undefined,
+    modules: modules?.length ? modules.split(",") : undefined,
+  };
 
-  const search = searchParams?.search || "";
-  const page = Number(searchParams?.page) || 1;
+  return parsedParams;
+}
 
-  const files = await getFiles({
-    page,
-    search,
-    professor: searchParams.professor,
-    module: searchParams.module,
-    schoolYear: searchParams.schoolYear,
-    academicYear: searchParams.academicYear,
-    semester: Number(searchParams.semester) || undefined,
-    section: searchParams.section,
-    group: searchParams.group,
-    speciality: searchParams.speciality,
-    type: searchParams.type,
-  });
+export type ParsedSearchParams = Awaited<ReturnType<typeof parseSearchParams>>;
+
+export default async function BrowsePage(props: { searchParams: SearchParams }) {
+  const searchParams = await parseSearchParams(props.searchParams);
+
+  const files = await getFiles(searchParams);
+  const majors = await getMajors()
+  const modules = await getModules();
+  const professors = await getProfessors();
 
   return (
-    <div className="max-w-5xl mx-auto p-6">
-      <h1 className="text-3xl font-bold text-center mb-6">Google Drive Files</h1>
+    <div className="flex-1 flex flex-col md:flex-row gap-6 p-4 h-[calc(100vh-calc(var(--spacing)*18))]">
+      <aside className="w-full md:w-72 shrink-0 border rounded-lg overflow-hidden md:sticky md:top-4">
+        <FileFilterSidebar
+          searchParams={searchParams}
+          majors={majors}
+          modules={modules}
+          professors={professors}
+        />
+      </aside>
 
-      <SearchBar searchParams={searchParams} />
-
-      {!files.length ? (
-        <p className="text-center text-gray-500">No matching files found.</p>
-      ) : (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {files.map((file) => (
-            <Card key={file.id} className="transition hover:shadow-lg">
-              <CardHeader>
-                <CardTitle className="text-lg truncate">{file.module}</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2 text-sm text-gray-600">
-                <p><strong>Type:</strong> {file.type}</p>
-                <p><strong>Professor:</strong> {file.professor}</p>
-                <p><strong>Academic Year:</strong> {file.academicYear}</p>
-                <p><strong>School Year:</strong> {file.schoolYear}</p>
-                <p><strong>Semester:</strong> {file.semester}</p>
-                <div className="flex justify-end">
-                  <Button variant="outline" asChild>
-                    <Link href={file.url} target="_blank" rel="noopener noreferrer">
-                      <Eye className="w-4 h-4 mr-2" /> View
-                    </Link>
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+      <main className="flex-1 pr-4 flex flex-col gap-4">
+        <div className="flex items-center justify-between">
+          <p className="text-sm text-muted-foreground">Showing 120 results</p>
+          <div className="flex items-center gap-2">
+            <Button variant="outline" size="sm">
+              Sort by: Recent
+            </Button>
+          </div>
         </div>
-      )}
 
-      <Pagination>
-        <PaginationContent>
-          <PaginationItem>
-            <PaginationPrevious href="#" />
-          </PaginationItem>
-          <PaginationItem>
-            <PaginationLink href="#">1</PaginationLink>
-          </PaginationItem>
-          <PaginationItem>
-            <PaginationEllipsis />
-          </PaginationItem>
-          <PaginationItem>
-            <PaginationNext href="#" />
-          </PaginationItem>
-        </PaginationContent>
-      </Pagination>
+        {files.length ? (
+          <ScrollArea className="flex overflow-hidden h-[100%] pr-4">
+            <div className="grid gap-4 grid-cols-1 lg:grid-cols-2 xl:grid-cols-4">
+              {files.map((file) => (
+                <Card key={file.id} className="relative">
+                  <CardHeader className="flex flex-row justify-between">
+                    <div className="flex items-center gap-4">
+                      <Link href={getFileDownloadUrl(file.id)} className="rounded-md bg-muted p-6 cursor-pointer" >
+                        <DownloadIcon className="w-5 h-5" />
+                      </Link>
+                      <div className="space-y-1">
+                        <p className="text-muted-foreground text-xs font-normal">{file.academicYear}/{file.academicYear + 1}</p>
+                        <CardTitle className="truncate hover:underline text-lg/[1em]">
+                          <Link href={getFileUrl(file.id)} target="_blank">
+                            {file.type} - {file.moduleName}
+                          </Link>
+                        </CardTitle>
+                        <div className="flex flex-wrap gap-1">
+                          <span className="inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10">
+                            {file.academicLevel}
+                          </span>
+                          <span className="inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-700/10">
+                            S-{file.section}
+                          </span>
+                          {file.group && (
+                            <span className="inline-flex items-center rounded-md bg-purple-50 px-2 py-1 text-xs font-medium text-purple-700 ring-1 ring-inset ring-purple-700/10">
+                              G-{file.group}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <h3 className="font-semibold">Details:</h3>
+                    <div className="text-sm">
+                      <p>Major: <span className="text-muted-foreground">{file.majorName}</span></p>
+                      <p>Professor: <span className="text-muted-foreground">{file.professorFullName}</span></p>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+
+            <div className="flex items-center justify-center mt-8">
+              <Button variant="outline" className="mx-2">
+                Previous
+              </Button>
+              <Button variant="outline" className="mx-2">
+                1
+              </Button>
+              <Button className="mx-2">2</Button>
+              <Button variant="outline" className="mx-2">
+                3
+              </Button>
+              <Button variant="outline" className="mx-2">
+                Next
+              </Button>
+            </div>
+          </ScrollArea>
+        ) : (
+          <div className="flex flex-col justify-center items-center gap-6 flex-1">
+            <NoDataIllustration height={300} width={300} />
+            <p className="text-muted-foreground text-xl mt-4">No files found...</p>
+          </div>
+        )}
+      </main>
     </div>
-  );
+  )
 }
