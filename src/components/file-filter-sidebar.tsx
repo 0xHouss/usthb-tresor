@@ -32,12 +32,12 @@ const academicLevels = [
 ]
 
 const fileTypes = [
-  "Lecture",
-  "DW Worksheet",
-  "PW Worksheet",
-  "Interrogation",
-  "Exam",
-  "PW Exam"
+  { label: "Lecture", value: "Lecture" },
+  { label: "DW Worksheet", value: "DW_Worksheet" },
+  { label: "PW Worksheet", value: "PW_Worksheet" },
+  { label: "Interrogation", value: "Interrogation" },
+  { label: "Exam", value: "Exam" },
+  { label: "PW Exam", value: "PW_Exam" },
 ]
 
 // Get current year for academic year range
@@ -477,12 +477,12 @@ export function FileFilterSidebar({ searchParams, majors, modules, professors }:
               <div className="flex flex-wrap gap-2">
                 {fileTypes.map(type => (
                   <Badge
-                    key={type}
-                    variant={selectedTypes.includes(type) ? "default" : "outline"}
+                    key={type.value}
+                    variant={selectedTypes.includes(type.value) ? "default" : "outline"}
                     className="cursor-pointer"
-                    onClick={() => toggleFilter(type, selectedTypes, setSelectedTypes)}
+                    onClick={() => toggleFilter(type.value, selectedTypes, setSelectedTypes)}
                   >
-                    {type}
+                    {type.label}
                   </Badge>
                 ))}
               </div>
