@@ -7,7 +7,7 @@ import { AcademicLevel, FileType, Semester } from "@prisma/client";
 import { DownloadIcon } from "lucide-react";
 import Link from "next/link";
 import { PaginationWithLinks } from "../../../components/pagination-with-links";
-import { getFiles, getMajors, getModules, getProfessors, PAGE_SIZE } from "./actions";
+import { getAcademicYearRange, getFiles, getMajors, getModules, getProfessors, PAGE_SIZE } from "./actions";
 
 export type SearchParams = Promise<{
   semester?: string;
@@ -56,6 +56,8 @@ export default async function BrowsePage(props: { searchParams: SearchParams }) 
   const start = (searchParams.page - 1) * PAGE_SIZE + 1;
   const end = Math.min(searchParams.page * PAGE_SIZE, totalCount);
 
+  const academicYearRange = await getAcademicYearRange();
+
   return (
     <div className="flex-1 flex flex-col md:flex-row gap-6 p-4 md:h-[calc(100vh-calc(var(--spacing)*18))]">
       <aside className="w-full md:w-72 shrink-0 border rounded-lg overflow-hidden md:sticky md:top-4">
@@ -64,6 +66,7 @@ export default async function BrowsePage(props: { searchParams: SearchParams }) 
           majors={majors}
           modules={modules}
           professors={professors}
+          academicYearRange={academicYearRange}
         />
       </aside>
 

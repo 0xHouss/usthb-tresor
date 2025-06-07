@@ -29,3 +29,10 @@ export const fileTypeLabels: { [key in FileType]: string } = {
   [FileType.Exam]: "Exam",
   [FileType.PW_Exam]: "PW Exam",
 };
+
+export function getCurrentAcademicYear() {
+  const now = new Date()
+
+  // If it's before September, the current academic year is the previous year
+  return now.getMonth() < 7 ? now.getFullYear() - 1 : now.getFullYear();
+}

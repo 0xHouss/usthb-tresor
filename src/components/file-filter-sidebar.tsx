@@ -1,5 +1,6 @@
 "use client"
 
+import { getAcademicYearRange } from "@/app/(home)/browse/actions"
 import { ParsedSearchParams } from "@/app/(home)/browse/page"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 import { Badge } from "@/components/ui/badge"
@@ -40,10 +41,6 @@ const fileTypes = [
   { label: "PW Exam", value: "PW_Exam" },
 ]
 
-// Get current year for academic year range
-const currentYear = new Date().getFullYear()
-const yearRange = Array.from({ length: 10 }, (_, i) => currentYear - i)
-
 interface SelectedItemBadgeProps {
   label: string
   value: string
@@ -67,21 +64,24 @@ interface FileFilterSidebarProps {
   majors: Major[]
   professors: Professor[]
   modules: Module[]
+  academicYearRange: Awaited<ReturnType<typeof getAcademicYearRange>>
 }
 
-export function FileFilterSidebar({ searchParams, majors, modules, professors }: FileFilterSidebarProps) {
+export function FileFilterSidebar({ searchParams, majors, modules, professors, academicYearRange: { minYear, maxYear } }: FileFilterSidebarProps) {
   const [open, setOpen] = useState(false)
   const [selectedMajors, setSelectedMajors] = useState<string[]>(searchParams.majors ?? [])
   const [selectedLevels, setSelectedLevels] = useState<string[]>(searchParams.academicLevels ?? [])
   const [section, setSection] = useState(searchParams.section ?? "")
   const [group, setGroup] = useState(searchParams.group ?? "")
-  const [startYear, setStartYear] = useState(searchParams.startYear ?? currentYear - 5)
-  const [endYear, setEndYear] = useState(searchParams.endYear ?? currentYear)
+  const [startYear, setStartYear] = useState(searchParams.startYear ?? minYear)
+  const [endYear, setEndYear] = useState(searchParams.endYear ?? maxYear)
   const [semester, setSemester] = useState<string | null>(searchParams.semester ?? null)
   const [selectedModules, setSelectedModules] = useState<string[]>(searchParams.modules ?? [])
   const [selectedProfessors, setSelectedProfessors] = useState<string[]>(searchParams.professors ?? [])
   const [selectedTypes, setSelectedTypes] = useState<string[]>(searchParams.types ?? [])
   const [filtersVisible, setFiltersVisible] = useState(true)
+
+  const yearRange = Array.from({ length: maxYear - minYear + 1 }, (_, i) => maxYear - i)
 
   const totalActiveFilters = [
     ...selectedMajors,
@@ -102,8 +102,8 @@ export function FileFilterSidebar({ searchParams, majors, modules, professors }:
     setSelectedLevels([])
     setSection("")
     setGroup("")
-    setStartYear(currentYear - 5)
-    setEndYear(currentYear)
+    setStartYear(minYear)
+    setEndYear(maxYear)
     setSemester(null)
     setSelectedModules([])
     setSelectedProfessors([])
