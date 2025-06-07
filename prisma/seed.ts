@@ -25,7 +25,7 @@ async function main() {
     Array.from({ length: 5 }).map(() =>
       prisma.module.create({
         data: {
-          name: faker.science.chemicalElement().name + ' Module',
+          name: faker.science.chemicalElement().name,
         },
       })
     )

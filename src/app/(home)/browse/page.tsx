@@ -2,7 +2,7 @@ import { FileFilterSidebar } from "@/components/file-filter-sidebar";
 import NoDataIllustration from "@/components/svg/no-data";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { getFileDownloadUrl, getFileUrl, isEnumValue } from "@/lib/utils";
+import { fileTypeLabels, getFileDownloadUrl, getFileUrl, isEnumValue } from "@/lib/utils";
 import { AcademicLevel, FileType, Semester } from "@prisma/client";
 import { DownloadIcon } from "lucide-react";
 import Link from "next/link";
@@ -57,7 +57,7 @@ export default async function BrowsePage(props: { searchParams: SearchParams }) 
   const end = Math.min(searchParams.page * PAGE_SIZE, totalCount);
 
   return (
-    <div className="flex-1 flex flex-col md:flex-row gap-6 p-4 h-[calc(100vh-calc(var(--spacing)*18))]">
+    <div className="flex-1 flex flex-col md:flex-row gap-6 p-4 md:h-[calc(100vh-calc(var(--spacing)*18))]">
       <aside className="w-full md:w-72 shrink-0 border rounded-lg overflow-hidden md:sticky md:top-4">
         <FileFilterSidebar
           searchParams={searchParams}
@@ -67,12 +67,12 @@ export default async function BrowsePage(props: { searchParams: SearchParams }) 
         />
       </aside>
 
-      <main className="flex-1 pr-4 flex flex-col gap-4">
+      <main className="flex-1 flex flex-col gap-4">
         <p className="text-sm text-muted-foreground">Showing {start}–{end} of {totalCount} result{totalCount !== 1 ? "s" : ""}</p>
 
         {files.length ? (
           <>
-            <ScrollArea className="flex overflow-hidden h-[100%] pr-4">
+            <ScrollArea className="flex overflow-hidden h-[100%] md:pr-4">
               <div className="grid gap-4 grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
                 {files.map((file) => (
                   <Card key={file.id} className="relative">
@@ -85,7 +85,7 @@ export default async function BrowsePage(props: { searchParams: SearchParams }) 
                           <p className="text-muted-foreground text-xs font-normal">{file.academicYear}/{file.academicYear + 1}</p>
                           <CardTitle className="truncate hover:underline text-lg/[1em]">
                             <Link href={getFileUrl(file.id)} target="_blank">
-                              {file.type} - {file.moduleName}
+                              {fileTypeLabels[file.type]} - {file.moduleName}
                             </Link>
                           </CardTitle>
                           <div className="flex flex-wrap gap-1">
