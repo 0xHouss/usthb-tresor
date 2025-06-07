@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { FileStatus } from "@prisma/client";
 import { ParsedSearchParams } from "./page";
+import { getCurrentAcademicYear } from "@/lib/utils";
 
 export const PAGE_SIZE = 12;
 
@@ -49,3 +50,28 @@ export async function getFiles({ academicLevels, modules, majors, professors, st
 export const getMajors = async () => prisma.major.findMany();
 export const getProfessors = async () => prisma.professor.findMany();
 export const getModules = async () => prisma.module.findMany();
+
+export async function getAcademicYearRange() {
+  // Get the minimum academicYear
+  const minResult = await prisma.file.aggregate({
+    _min: {
+      academicYear: true,
+    },
+  });
+
+  // Get the maximum academicYear
+  const maxResult = await prisma.file.aggregate({
+    _max: {
+      academicYear: true,
+    },
+  });
+
+  // Extract the values, they can be null if no rows exist
+  const minYear = minResult._min.academicYear || 1974;
+  const maxYear = (maxResult._max.academicYear ? maxResult._max.academicYear : getCurrentAcademicYear()) + 1;
+
+  return {
+    minYear,
+    maxYear,
+  };
+}

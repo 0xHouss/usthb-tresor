@@ -3,6 +3,7 @@ if (process.env.NODE_ENV === 'production') {
   process.exit(1);
 }
 
+import { getCurrentAcademicYear } from '@/lib/utils';
 import { faker } from '@faker-js/faker';
 import { PrismaClient } from '@prisma/client';
 
@@ -54,7 +55,7 @@ async function main() {
           id: faker.string.uuid(),
           type: faker.helpers.arrayElement(fileTypes),
           academicLevel: faker.helpers.arrayElement(academicLevels),
-          academicYear: faker.number.int({ min: 2019, max: 2025 }),
+          academicYear: faker.number.int({ min: 1974, max: getCurrentAcademicYear() }),
           semester: faker.helpers.arrayElement(semesters),
           section: faker.number.int({ min: 1, max: 5 }).toString(),
           group: faker.number.int({ min: 1, max: 3 }).toString(),
