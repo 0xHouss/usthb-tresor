@@ -87,33 +87,18 @@ export async function uploadFile(state: FormState, formData: FormData): Promise<
       },
     });
 
-    await prisma.file.create({
+    await prisma.pendingFile.create({
       data: {
         driveId: fileId,
         uploadedBy: { connect: { email: user.email } },
         academicLevel: metadata.academicLevel,
-        major: {
-          connectOrCreate: {
-            where: { name: metadata.major },
-            create: { name: metadata.major },
-          }
-        },
+        majorName: metadata.major,
         section: metadata.section,
         group: metadata.group,
         academicYear: +metadata.academicYear.split("/")[0],
         semester: metadata.semester,
-        module: {
-          connectOrCreate: {
-            where: { name: metadata.module },
-            create: { name: metadata.module },
-          }
-        },
-        professor: {
-          connectOrCreate: {
-            where: { fullName: metadata.professor },
-            create: { fullName: metadata.professor },
-          }
-        },
+        moduleName: metadata.module,
+        professorFullName: metadata.professor,
         type: metadata.type,
       }
     })
@@ -129,43 +114,5 @@ export async function uploadFile(state: FormState, formData: FormData): Promise<
     console.error("File upload error:", error);
 
     return fromErrorToFormState(error, formData)
-  }
-}
-
-export async function createPublicFolder(folderName: string) {
-  try {
-    // Create the folder
-    const folder = await drive.files.create({
-      requestBody: {
-        name: folderName,
-        mimeType: "application/vnd.google-apps.folder",
-      },
-      fields: "id",
-    });
-
-    const folderId = folder.data.id;
-    if (!folderId) throw new Error("Failed to create folder.");
-
-    // Make the folder public
-    await drive.permissions.create({
-      fileId: folderId,
-      requestBody: {
-        role: "reader",
-        type: "anyone",
-      },
-    });
-
-    // Get and return the folder's link
-    const { data } = await drive.files.get({
-      fileId: folderId,
-      fields: "webViewLink",
-    });
-
-    console.log(data.webViewLink);
-
-    return { success: "Folder created successfully!", link: data.webViewLink };
-  } catch (error) {
-    console.error(error);
-    return { error: "Failed to create folder." };
   }
 }

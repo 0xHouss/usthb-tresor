@@ -1,6 +1,7 @@
 import { PendingFilesTable } from "@/components/pending-files-table"
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
+import { FileStatus } from "@prisma/client"
 import { redirect } from "next/navigation"
 
 export default async function DashboardPage() {
@@ -13,7 +14,7 @@ export default async function DashboardPage() {
     redirect("/")
   }
 
-  const pendingFiles = await prisma.file.findMany({ where: { status: "Pending" } })
+  const pendingFiles = await prisma.pendingFile.findMany({ where: { status: FileStatus.Pending } })
   
   return (
     <div className="flex flex-col p-10 gap-10">

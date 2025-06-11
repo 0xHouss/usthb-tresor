@@ -1,8 +1,9 @@
 "use server"
 
-import { revalidatePath } from "next/cache"
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
+import { FileStatus } from "@prisma/client"
+import { revalidatePath } from "next/cache"
 
 export async function approveFile(fileId: string) {
   const session = await auth()
@@ -16,9 +17,44 @@ export async function approveFile(fileId: string) {
   }
 
   try {
-    await prisma.file.update({
+    const pendingFile = await prisma.pendingFile.findUniqueOrThrow({
+      where: { id: fileId }
+    })
+
+    await prisma.file.create({
+      data: {
+        driveId: pendingFile.driveId,
+        type: pendingFile.type,
+        academicLevel: pendingFile.academicLevel,
+        academicYear: pendingFile.academicYear,
+        semester: pendingFile.semester,
+        section: pendingFile.section,
+        group: pendingFile.group,
+        major: {
+          connectOrCreate: {
+            where: { name: pendingFile.majorName },
+            create: { name: pendingFile.majorName }
+          }
+        },
+        module: {
+          connectOrCreate: {
+            where: { name: pendingFile.moduleName },
+            create: { name: pendingFile.moduleName }
+          }
+        },
+        professor: {
+          connectOrCreate: {
+            where: { fullName: pendingFile.professorFullName },
+            create: { fullName: pendingFile.professorFullName }
+          }
+        },
+        uploadedBy: { connect: { email: pendingFile.uploadedByEmail } },
+      }
+    })
+
+    await prisma.pendingFile.update({
       where: { id: fileId },
-      data: { status: "Approved" },
+      data: { status: FileStatus.Approved },
     })
 
     revalidatePath("/dashboard")
@@ -42,9 +78,9 @@ export async function rejectFile(fileId: string) {
   }
 
   try {
-    await prisma.file.update({
+    await prisma.pendingFile.update({
       where: { id: fileId },
-      data: { status: "Rejected" },
+      data: { status: FileStatus.Rejected },
     })
 
     revalidatePath("/dashboard")
