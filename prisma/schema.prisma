@@ -14,6 +14,7 @@ enum UserRole {
   Moderator
   Admin
 }
+
 model User {
   id            String    @id @default(cuid())
   name          String?
@@ -108,26 +109,29 @@ enum Semester {
   S1
   S2
 }
+
 model File {
-  id            String        @id
-  type          FileType
-  
+  id      String @id @default(cuid())
+  driveId String @unique
+
+  type FileType
+
   academicLevel AcademicLevel
   academicYear  Int
   semester      Semester
   section       String
   group         String?
 
-  major         Major @relation(fields: [majorName], references: [name])
-  majorName     String
-  
-  module        Module @relation(fields: [moduleName], references: [name])
-  moduleName    String
+  major     Major  @relation(fields: [majorName], references: [name])
+  majorName String
 
-  professor     Professor @relation(fields: [professorFullName], references: [fullName])
+  module     Module @relation(fields: [moduleName], references: [name])
+  moduleName String
+
+  professor         Professor @relation(fields: [professorFullName], references: [fullName])
   professorFullName String
 
-  status     FileStatus @default(Approved) // TODO: Change to Pending in production
+  status     FileStatus @default(Pending)
   uploadedAt DateTime   @default(now())
 
   uploadedBy      User   @relation(fields: [uploadedByEmail], references: [email])
@@ -135,20 +139,22 @@ model File {
 }
 
 model Professor {
-  fullName String @id
+  id       String @id @default(cuid())
+  fullName String @unique
 
   File File[]
 }
 
 model Module {
-  name String @id
+  id  String @id @default(cuid())
+  name String @unique
 
   File File[]
 }
 
 model Major {
-  name String @id
+  id   String @id @default(cuid())
+  name String @unique
 
   File File[]
 }
-

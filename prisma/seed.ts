@@ -5,7 +5,7 @@ if (process.env.NODE_ENV === 'production') {
 
 import { getCurrentAcademicYear } from '@/lib/utils';
 import { faker } from '@faker-js/faker';
-import { PrismaClient } from '@prisma/client';
+import { FileStatus, PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
@@ -52,7 +52,7 @@ async function main() {
     Array.from({ length: 100 }).map(() =>
       prisma.file.create({
         data: {
-          id: faker.string.uuid(),
+          driveId: faker.string.uuid(),
           type: faker.helpers.arrayElement(fileTypes),
           academicLevel: faker.helpers.arrayElement(academicLevels),
           academicYear: faker.number.int({ min: 1974, max: getCurrentAcademicYear() }),
@@ -63,7 +63,7 @@ async function main() {
           moduleName: faker.helpers.arrayElement(modules).name,
           professorFullName: faker.helpers.arrayElement(professors).fullName,
           uploadedByEmail: 'tkthoussam@gmail.com',
-          status: 'Approved',
+          status: FileStatus.Pending,
         },
       })
     )

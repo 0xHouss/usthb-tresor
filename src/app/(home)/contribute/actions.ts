@@ -89,7 +89,7 @@ export async function uploadFile(state: FormState, formData: FormData): Promise<
 
     await prisma.file.create({
       data: {
-        id: fileId,
+        driveId: fileId,
         uploadedBy: { connect: { email: user.email } },
         academicLevel: metadata.academicLevel,
         major: {
@@ -126,6 +126,8 @@ export async function uploadFile(state: FormState, formData: FormData): Promise<
       reset: true,
     });
   } catch (error) {
+    console.error("File upload error:", error);
+
     return fromErrorToFormState(error, formData)
   }
 }

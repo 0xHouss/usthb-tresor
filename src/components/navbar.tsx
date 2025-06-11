@@ -41,8 +41,8 @@ export function Navbar({ user }: NavbarProps) {
             <NavLink href="/contribute" label="Contribute" />
             <NavLink href="/contact" label="Contact Us" />
 
-            {user?.role === "Admin" && (
-              <NavLink href="/admin" label="Dashboard" />
+            {["Admin", "Moderator"].includes(user?.role || "Visitor") && (
+              <NavLink href="/submissions" label="Submissions" />
             )}
           </div>
         </div>
@@ -104,7 +104,7 @@ export function Navbar({ user }: NavbarProps) {
 
             {user?.role === "Admin" && (
               <Link
-                href="/admin"
+                href="/dashboard"
                 className="block px-3 py-2 text-base font-medium text-foreground hover:text-primary hover:bg-accent rounded-md transition-colors"
                 onClick={closeMobileMenu}
               >
