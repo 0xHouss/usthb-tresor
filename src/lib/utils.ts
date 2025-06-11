@@ -1,7 +1,6 @@
 import { FileType } from "@prisma/client";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
-import { z } from "zod";
 
 export const cn = (...inputs: ClassValue[]) => twMerge(clsx(inputs))
 

@@ -95,7 +95,7 @@ export function CreatableCombobox({
               <CommandGroup>
                 <CommandItem onSelect={handleSelectCustom} className="text-muted-foreground">
                   <Plus className="mr-2 h-4 w-4" />
-                  {selectMessage} "{inputValue}"
+                  {selectMessage} &quot;{inputValue}&quot;
                 </CommandItem>
               </CommandGroup>
             )}
