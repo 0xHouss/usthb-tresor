@@ -23,5 +23,5 @@ export function useToastMessage(formState: FormState) {
 
       if (formState.redirect) router.push(formState.redirect)
     }
-  }, [formState, showToast]);
+  }, [formState, showToast, router]);
 };

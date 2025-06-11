@@ -1,7 +1,6 @@
 import { login } from "@/actions/auth-actions"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { Button } from "@/components/ui/button"
-import { signIn } from "@/lib/auth"
 import Image from "next/image"
 import Link from "next/link"
 
