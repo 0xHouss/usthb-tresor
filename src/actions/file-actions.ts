@@ -1,9 +1,192 @@
 "use server"
 
-import { auth } from "@/lib/auth"
+import { ParsedSearchParams } from "@/app/(home)/browse/page"
+import { auth, signOut } from "@/lib/auth"
+import ENV from "@/lib/env"
+import { FormState, fromErrorToFormState, toFormState } from "@/lib/form-state"
+import { drive } from "@/lib/google-drive"
 import { prisma } from "@/lib/prisma"
-import { FileStatus } from "@prisma/client"
+import { getCurrentAcademicYear, PAGE_SIZE } from "@/lib/utils"
+import { AcademicLevel, FileStatus, FileType, Semester } from "@prisma/client"
+import fs from "fs"
 import { revalidatePath } from "next/cache"
+import { z } from "zod"
+
+export const getMajors = prisma.major.findMany;
+export const getProfessors = prisma.professor.findMany;
+export const getModules = prisma.module.findMany;
+
+export async function getAcademicYearRange() {
+  // Get the minimum academicYear
+  const minResult = await prisma.file.aggregate({
+    _min: {
+      academicYear: true,
+    },
+  });
+
+  // Get the maximum academicYear
+  const maxResult = await prisma.file.aggregate({
+    _max: {
+      academicYear: true,
+    },
+  });
+
+  // Extract the values, they can be null if no rows exist
+  const minYear = minResult._min.academicYear || 1974;
+  const maxYear = (maxResult._max.academicYear ? maxResult._max.academicYear : getCurrentAcademicYear()) + 1;
+
+  return {
+    minYear,
+    maxYear,
+  };
+}
+
+export async function getFiles({ academicLevels, modules, majors, professors, startYear, endYear, semester, types, group, section, page }: ParsedSearchParams) {
+  const files = await prisma.file.findMany({
+    where: {
+      moduleName: modules?.length ? { in: modules } : undefined,
+      professorFullName: professors?.length ? { in: professors } : undefined,
+      academicLevel: academicLevels?.length ? { in: academicLevels } : undefined,
+      semester: semester ? { equals: semester } : undefined,
+      type: types?.length ? { in: types } : undefined,
+      majorName: majors?.length ? { in: majors } : undefined,
+      academicYear: {
+        gte: startYear,
+        lte: endYear,
+      },
+      section: { equals: section },
+      group: { equals: group },
+    },
+    take: PAGE_SIZE,
+    skip: (page - 1) * PAGE_SIZE,
+  });
+
+  const totalCount = await prisma.file.count({
+    where: {
+      moduleName: modules?.length ? { in: modules } : undefined,
+      professorFullName: professors?.length ? { in: professors } : undefined,
+      academicLevel: academicLevels?.length ? { in: academicLevels } : undefined,
+      semester: semester ? { equals: semester } : undefined,
+      type: types?.length ? { in: types } : undefined,
+      majorName: majors?.length ? { in: majors } : undefined,
+      academicYear: {
+        gte: startYear ? startYear : undefined,
+        lte: endYear ? endYear : undefined,
+      },
+      section: { equals: section },
+      group: { equals: group },
+    }
+  });
+
+  return { files, totalCount };
+}
+
+const UploadFormSchema = z.object({
+  major: z.string(),
+  academicLevel: z.string({ message: 'Please select an option.' }).min(1, 'Please select an option.').pipe(z.nativeEnum(AcademicLevel, { message: 'Please select a valid option.' })),
+  section: z.string(),
+  group: z.string(),
+  academicYear: z
+    .string()
+    .regex(/^\d{4}\/\d{4}$/, "Academic year must be in format YYYY/YYYY")
+    .refine(y => +y.split("/")[1] === +y.split("/")[0] + 1, "The second year must be the first year plus one."),
+  semester: z.string({ message: 'Please select an option.' }).min(1, 'Please select an option.').pipe(z.nativeEnum(Semester, { message: 'Please select a valid option.' })),
+  module: z.string(),
+  professor: z.string(),
+  type: z.string({ message: 'Please select an option.' }).min(1, 'Please select an option.').pipe(z.nativeEnum(FileType, { message: 'Please select a valid option.' })),
+  file: z
+    .instanceof(File)
+    .refine(f => f.size, 'Please provide a file.')
+    .refine(file => file.type === 'application/pdf', 'Only PDF files are allowed.')
+})
+
+export async function uploadFile(state: FormState, formData: FormData): Promise<FormState> {
+  try {
+    const session = await auth();
+    const user = session?.user;
+
+    if (!user || !user.email)
+      throw new Error('Unauthorized access.');
+
+    const dbUser = await prisma.user.findUnique({
+      where: { email: user.email }
+    });
+
+    if (!dbUser) signOut({ redirectTo: '/login' });
+
+    const { file, ...metadata } = UploadFormSchema.parse({
+      major: formData.get('major'),
+      academicLevel: formData.get('academicLevel'),
+      section: formData.get('section'),
+      group: formData.get('group'),
+      academicYear: formData.get('academicYear'),
+      semester: formData.get('semester'),
+      module: formData.get('module'),
+      professor: formData.get('professor'),
+      type: formData.get('type'),
+      file: formData.get('file'),
+    });
+
+    const bytes = await file.arrayBuffer();
+    const buffer = Buffer.from(bytes);
+    const tempPath = `/tmp/${file.name}`;
+    fs.writeFileSync(tempPath, buffer);
+
+    // Upload file to Google Drive
+    const fileUploadResponse = await drive.files.create({
+      requestBody: {
+        name: `${metadata.type} ${metadata.module} ${metadata.major} ${metadata.academicLevel} S-${metadata.section}${metadata.group ? `G-${metadata.group}` : ''} ${metadata.academicYear}.pdf`,
+        parents: [ENV.GOOGLE_DRIVE_FOLDER_ID],
+      },
+      media: {
+        mimeType: "application/pdf",
+        body: fs.createReadStream(tempPath),
+      },
+      fields: "id",
+    });
+
+    // Get the uploaded file ID
+    const fileId = fileUploadResponse.data.id;
+    if (!fileId) throw new Error("File upload failed.");
+
+    // Make file publicly accessible
+    await drive.permissions.create({
+      fileId,
+      requestBody: {
+        role: "reader",
+        type: "anyone",
+      },
+    });
+
+    await prisma.pendingFile.create({
+      data: {
+        driveId: fileId,
+        uploadedBy: { connect: { email: user.email } },
+        academicLevel: metadata.academicLevel,
+        majorName: metadata.major,
+        section: metadata.section,
+        group: metadata.group,
+        academicYear: +metadata.academicYear.split("/")[0],
+        semester: metadata.semester,
+        moduleName: metadata.module,
+        professorFullName: metadata.professor,
+        type: metadata.type,
+      }
+    })
+
+    fs.unlinkSync(tempPath);
+    revalidatePath("/contribute");
+
+    return toFormState('SUCCESS', formData, {
+      message: 'File uploaded successfully!',
+      reset: true,
+    });
+  } catch (error) {
+    console.error("File upload error:", error);
+
+    return fromErrorToFormState(error, formData)
+  }
+}
 
 export async function approveFile(fileId: string) {
   const session = await auth()

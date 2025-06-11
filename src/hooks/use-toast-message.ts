@@ -12,16 +12,16 @@ export function useToastMessage(formState: FormState) {
     formState.timestamp !== prevTimestamp.current;
 
   useEffect(() => {
-    if (showToast) {
-      if (formState.status === 'ERROR') {
-        toast.error(formState.message);
-      } else {
-        toast.success(formState.message);
-      }
+    if (!showToast) return;
 
-      prevTimestamp.current = formState.timestamp;
+    if (formState.status === 'ERROR')
+      toast.error(formState.message);
+    else
+      toast.success(formState.message);
 
-      if (formState.redirect) router.push(formState.redirect)
-    }
+    prevTimestamp.current = formState.timestamp;
+
+    if (formState.redirect)
+      router.push(formState.redirect)
   }, [formState, showToast, router]);
 };

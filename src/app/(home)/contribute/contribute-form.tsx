@@ -1,5 +1,7 @@
 "use client";
 
+import { uploadFile } from "@/actions/file-actions";
+import { CreatableCombobox } from "@/components/creatable-combobox";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -9,8 +11,6 @@ import { EMPTY_FORM_STATE, getPrevValue } from "@/lib/form-state";
 import { AcademicLevel, FileType, Major, Module, Professor, Semester } from "@prisma/client";
 import { Upload } from "lucide-react";
 import { useActionState, useEffect, useState } from "react";
-import { uploadFile } from "./actions";
-import { CreatableCombobox } from "@/components/creatable-combobox";
 
 interface ContributeFormProps {
   majors: Major[];
@@ -18,7 +18,7 @@ interface ContributeFormProps {
   modules: Module[];
 }
 
-export function ContributeForm({ majors, professors, modules}: ContributeFormProps) {
+export function ContributeForm({ majors, professors, modules }: ContributeFormProps) {
   const [file, setFile] = useState<File | null>(null);
   const [fileType, setFileType] = useState("")
   const [semester, setSemester] = useState("")

@@ -35,3 +35,5 @@ export function getCurrentAcademicYear() {
   // If it's before September, the current academic year is the previous year
   return now.getMonth() < 7 ? now.getFullYear() - 1 : now.getFullYear();
 }
+
+export const PAGE_SIZE = 12;

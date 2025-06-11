@@ -1,6 +1,6 @@
 "use client"
 
-import { getAcademicYearRange } from "@/app/(home)/browse/actions"
+import { getAcademicYearRange } from "@/actions/file-actions"
 import { ParsedSearchParams } from "@/app/(home)/browse/page"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 import { Badge } from "@/components/ui/badge"
@@ -152,7 +152,7 @@ export function FileFilterSidebar({ searchParams, majors, modules, professors, a
           </Badge>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="ghost" size="sm" onClick={clearAllFilters} className="px-2 h-0 text-xs">
+          <Button variant="ghost" size="sm" onClick={clearAllFilters} className="px-2 h-0 text-xs cursor-pointer">
             Clear all
           </Button>
           <Button

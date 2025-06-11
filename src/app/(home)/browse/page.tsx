@@ -1,13 +1,13 @@
+import { getAcademicYearRange, getFiles, getMajors, getModules, getProfessors } from "@/actions/file-actions";
 import { FileFilterSidebar } from "@/components/file-filter-sidebar";
 import NoDataIllustration from "@/components/svg/no-data";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { fileTypeLabels, getFileDownloadUrl, getFileUrl, isEnumValue } from "@/lib/utils";
+import { fileTypeLabels, getFileDownloadUrl, getFileUrl, isEnumValue, PAGE_SIZE } from "@/lib/utils";
 import { AcademicLevel, FileType, Semester } from "@prisma/client";
 import { DownloadIcon } from "lucide-react";
 import Link from "next/link";
 import { PaginationWithLinks } from "../../../components/pagination-with-links";
-import { getAcademicYearRange, getFiles, getMajors, getModules, getProfessors, PAGE_SIZE } from "./actions";
 
 export type SearchParams = Promise<{
   semester?: string;
