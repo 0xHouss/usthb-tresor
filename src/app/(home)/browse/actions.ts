@@ -16,8 +16,8 @@ export async function getFiles({ academicLevels, modules, majors, professors, st
       type: types?.length ? { in: types } : undefined,
       majorName: majors?.length ? { in: majors } : undefined,
       academicYear: {
-        gte: startYear ? startYear : undefined,
-        lte: endYear ? endYear : undefined,
+        gte: startYear,
+        lte: endYear,
       },
       section: { equals: section },
       group: { equals: group },
