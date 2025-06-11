@@ -1,11 +1,10 @@
-import { prisma } from "@/lib/prisma";
-import { ContributeForm } from "./contribute-form";
 import { getMajors, getModules, getProfessors } from "../browse/actions";
+import { ContributeForm } from "./contribute-form";
 
 export default async function ContributePage() {
   const majors = await getMajors()
   const professors = await getProfessors()
-  const modules = await getModules() 
+  const modules = await getModules()
 
   return (
     <div className="max-w-2xl mx-auto py-10">

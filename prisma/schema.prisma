@@ -29,6 +29,7 @@ model User {
   updatedAt DateTime @updatedAt
 
   File File[]
+  PendingFile PendingFile[]
 }
 
 model Account {
@@ -110,6 +111,30 @@ enum Semester {
   S2
 }
 
+model PendingFile {
+  id      String @id @default(cuid())
+  driveId String @unique
+
+  type FileType
+
+  academicLevel AcademicLevel
+  academicYear  Int
+  semester      Semester
+  section       String
+  group         String?
+
+  majorName     String
+  moduleName    String
+  professorFullName String
+
+  status     FileStatus @default(Pending)
+
+  uploadedAt      DateTime @default(now())
+
+  uploadedBy User @relation(fields: [uploadedByEmail], references: [email])
+  uploadedByEmail String
+}
+
 model File {
   id      String @id @default(cuid())
   driveId String @unique
@@ -131,7 +156,6 @@ model File {
   professor         Professor @relation(fields: [professorFullName], references: [fullName])
   professorFullName String
 
-  status     FileStatus @default(Pending)
   uploadedAt DateTime   @default(now())
 
   uploadedBy      User   @relation(fields: [uploadedByEmail], references: [email])
