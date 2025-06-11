@@ -13,7 +13,6 @@ export function useFormReset(formState: FormState) {
       formState.reset
     ) {
       formRef.current.reset();
-
       prevTimestamp.current = formState.timestamp;
     }
   }, [formState.status, formState.timestamp, formState.reset]);

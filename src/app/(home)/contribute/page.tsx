@@ -1,4 +1,4 @@
-import { getMajors, getModules, getProfessors } from "../browse/actions";
+import { getMajors, getModules, getProfessors } from "@/actions/file-actions";
 import { ContributeForm } from "./contribute-form";
 
 export default async function ContributePage() {

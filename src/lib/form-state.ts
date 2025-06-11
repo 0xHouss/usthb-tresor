@@ -38,7 +38,7 @@ export function fromErrorToFormState(error: unknown, formData: FormData): FormSt
 
 export const toFormState = (
   status: FormState['status'],
-  formData: FormData, 
+  formData: FormData,
   {
     message = '',
     redirect = '',
