@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { ComponentPropsWithoutRef } from "react";
 
-function Hero() {
+async function Hero() {
   return (
     <Section className="flex flex-col items-center justify-center my-25">
       <h1 className="text-[64px] font-extrabold text-center my-5">{"All of USTHB's Knowledge,"}<br />{"in one place."}</h1>

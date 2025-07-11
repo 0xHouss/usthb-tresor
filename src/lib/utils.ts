@@ -36,4 +36,4 @@ export function getCurrentAcademicYear() {
   return now.getMonth() < 7 ? now.getFullYear() - 1 : now.getFullYear();
 }
 
-export const PAGE_SIZE = 12;
+export const PAGE_SIZE = 24;

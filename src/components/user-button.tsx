@@ -4,11 +4,11 @@ import { User } from 'next-auth'
 import Image from 'next/image'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from './ui/dropdown-menu'
 
-interface UserDropdownProps {
+interface UserButtonProps {
   user: User
 }
 
-export default function UserDropdown({ user }: UserDropdownProps) {
+export default function UserButton({ user }: UserButtonProps) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger className="focus-visible:outline-none focus:outline-none">
