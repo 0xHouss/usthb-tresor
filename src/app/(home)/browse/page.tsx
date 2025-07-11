@@ -8,6 +8,7 @@ import { AcademicLevel, FileType, Semester } from "@prisma/client";
 import { DownloadIcon } from "lucide-react";
 import Link from "next/link";
 import { PaginationWithLinks } from "../../../components/pagination-with-links";
+import ResourceCard from "@/components/resource-card";
 
 export type SearchParams = Promise<{
   semester?: string;
@@ -78,43 +79,7 @@ export default async function BrowsePage(props: { searchParams: SearchParams }) 
             <ScrollArea className="flex overflow-hidden h-[100%] md:pr-4">
               <div className="grid gap-4 grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
                 {files.map((file) => (
-                  <Card key={file.id} className="relative">
-                    <CardHeader className="flex flex-row justify-between">
-                      <div className="flex items-center gap-4">
-                        <Link href={getFileDownloadUrl(file.id)} className="rounded-md bg-muted p-6 cursor-pointer" >
-                          <DownloadIcon className="w-5 h-5" />
-                        </Link>
-                        <div className="space-y-1">
-                          <p className="text-muted-foreground text-xs font-normal">{file.academicYear}/{file.academicYear + 1}</p>
-                          <CardTitle className="truncate hover:underline text-lg/[1em]">
-                            <Link href={getFileUrl(file.id)} target="_blank">
-                              {fileTypeLabels[file.type]} - {file.moduleName}
-                            </Link>
-                          </CardTitle>
-                          <div className="flex flex-wrap gap-1">
-                            <span className="inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10">
-                              {file.academicLevel}
-                            </span>
-                            <span className="inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-700/10">
-                              S-{file.section}
-                            </span>
-                            {file.group && (
-                              <span className="inline-flex items-center rounded-md bg-purple-50 px-2 py-1 text-xs font-medium text-purple-700 ring-1 ring-inset ring-purple-700/10">
-                                G-{file.group}
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    </CardHeader>
-                    <CardContent>
-                      <h3 className="font-semibold">Details:</h3>
-                      <div className="text-sm">
-                        <p>Major: <span className="text-muted-foreground">{file.majorName}</span></p>
-                        <p>Professor: <span className="text-muted-foreground">{file.professorFullName}</span></p>
-                      </div>
-                    </CardContent>
-                  </Card>
+                  <ResourceCard key={file.id} file={file} />
                 ))}
               </div>
             </ScrollArea>

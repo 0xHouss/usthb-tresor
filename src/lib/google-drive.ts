@@ -1,17 +1,12 @@
-import fs from 'fs';
 import { google } from 'googleapis';
-
-const credentials = JSON.parse(fs.readFileSync('credentials.json', 'utf8'));
-const token = JSON.parse(fs.readFileSync('token.json', 'utf8'));
-
-const { client_secret, client_id, redirect_uris } = credentials.installed;
+import ENV from './env';
 
 const oAuth2Client = new google.auth.OAuth2(
-  client_id,
-  client_secret,
-  redirect_uris[0]
+  ENV.GOOGLE_DRIVE_CLIENT_ID,
+  ENV.GOOGLE_DRIVE_CLIENT_SECRET,
+  ENV.GOOGLE_DRIVE_REDIRECT_URI
 );
 
-oAuth2Client.setCredentials(token);
+oAuth2Client.setCredentials({ refresh_token: ENV.GOOGLE_DRIVE_REFRESH_TOKEN });
 
 export const drive = google.drive({ version: 'v3', auth: oAuth2Client });
