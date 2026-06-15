@@ -1,4 +1,4 @@
-import { UserRole } from "@prisma/client";
+import { UserRole } from "@/generated/prisma/client";
 import type { User as SessionUser } from "next-auth";
 
 declare module 'next-auth/jwt' {
