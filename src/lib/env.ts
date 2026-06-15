@@ -13,6 +13,10 @@ const envSchema = z.object({
     NEXTAUTH_SECRET: z
         .string({ error: "AUTH_SECRET is required" })
         .min(1, "AUTH_SECRET is required"),
+    // Optional at boot: only required when uploading/downloading files via Drive.
+    // Validated at call time in src/lib/drive.ts so the app stays bootable for browse-only.
+    GOOGLE_SERVICE_ACCOUNT_JSON: z.string().optional(),
+    GOOGLE_DRIVE_FOLDER_ID: z.string().optional(),
 })
 
 const ENV = envSchema.parse(process.env)
