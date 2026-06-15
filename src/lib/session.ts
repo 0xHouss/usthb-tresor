@@ -1,24 +1,25 @@
 import { getServerSession } from "next-auth";
+import { redirect } from "next/navigation";
+import { authOptions } from "@/lib/auth";
+import type { UserRole } from "@/generated/prisma/client";
 
+/** Returns the current session user, or undefined if not signed in. */
 export async function getUserSession() {
-    const authUserSession = await getServerSession()
-    return authUserSession?.user
+    const session = await getServerSession(authOptions);
+    return session?.user;
 }
 
-// import { User, getServerSession } from 'next-auth'
+/** Returns the current user, redirecting to /login when not signed in. */
+export async function requireUser() {
+    const user = await getUserSession();
+    if (!user) redirect("/login");
+    return user;
+}
 
-// export const session = async ({ session, token }: any) => {
-//   session.user.id = token.id
-//   session.user.tenant = token.tenant
-//   return session
-// }
-
-// export const getUserSession = async (): Promise<User> => {
-//   const authUserSession = await getServerSession({
-//     callbacks: {
-//       session
-//     }
-//   })
-//   if (!authUserSession) throw new Error('unauthorized')
-//   return authUserSession.user
-// }
+/** Returns the current user when their role is allowed; otherwise redirects. */
+export async function requireRole(roles: UserRole[]) {
+    const user = await getUserSession();
+    if (!user) redirect("/login");
+    if (!roles.includes(user.role)) redirect("/");
+    return user;
+}
