@@ -48,3 +48,7 @@ prisma/dev.db
 # google drive
 credentials.json
 token.json
+
+# skills (npx skills) — restore with: npx skills experimental_install
+.agents/
+.claude/skills/
