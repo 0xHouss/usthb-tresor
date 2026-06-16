@@ -136,3 +136,34 @@ export function getMajorsWithModules() {
 export function listProfessors() {
     return prisma.professor.findMany({ orderBy: { fullName: "asc" } });
 }
+
+export function listMajors() {
+    return prisma.major.findMany({
+        orderBy: { name: "asc" },
+        select: { id: true, name: true },
+    });
+}
+
+/** Aggregate counts for the landing page. */
+export async function getResourceStats() {
+    const [resources, majors, modules, contributors] = await Promise.all([
+        prisma.resource.count({ where: { status: "APPROVED" } }),
+        prisma.major.count(),
+        prisma.module.count(),
+        prisma.resource.findMany({
+            where: { status: "APPROVED" },
+            distinct: ["contributorEmail"],
+            select: { contributorEmail: true },
+        }),
+    ]);
+    return { resources, majors, modules, contributors: contributors.length };
+}
+
+export function getRecentResources(take = 6) {
+    return prisma.resource.findMany({
+        where: { status: "APPROVED" },
+        include: resourceInclude,
+        orderBy: { createdAt: "desc" },
+        take,
+    });
+}
