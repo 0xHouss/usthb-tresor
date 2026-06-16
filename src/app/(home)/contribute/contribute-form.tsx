@@ -8,9 +8,11 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToastMessage } from "@/hooks/use-toast-message";
 import { EMPTY_FORM_STATE, getPrevValue } from "@/lib/form-state";
+import { MAX_FILE_SIZE, MAX_FILE_SIZE_MB } from "@/lib/utils";
 import { AcademicLevel, FileType, Major, Module, Professor, Semester } from "@prisma/client";
 import { Upload } from "lucide-react";
 import { useActionState, useEffect, useState } from "react";
+import { toast } from "sonner";
 
 interface ContributeFormProps {
   majors: Major[];
@@ -195,12 +197,21 @@ export function ContributeForm({ majors, professors, modules }: ContributeFormPr
             className="hidden"
             id="fileInput"
             name="file"
-            onChange={e => setFile(e.target.files?.[0] || null)}
+            onChange={e => {
+              const selected = e.target.files?.[0] || null;
+              if (selected && selected.size > MAX_FILE_SIZE) {
+                toast.error(`File must be ${MAX_FILE_SIZE_MB} MB or smaller.`);
+                e.target.value = "";
+                setFile(null);
+                return;
+              }
+              setFile(selected);
+            }}
             defaultValue={getPrevValue(state, 'file')}
           />
           <Label htmlFor="fileInput" className="cursor-pointer flex flex-col items-center gap-2">
             <Upload className="w-6 h-6 text-gray-500" />
-            <span className="text-sm text-gray-500">{file ? file.name : "Click to upload a PDF"}</span>
+            <span className="text-sm text-gray-500">{file ? file.name : `Click to upload a PDF (max ${MAX_FILE_SIZE_MB} MB)`}</span>
           </Label>
 
         </div>

@@ -12,7 +12,8 @@ const nextConfig: NextConfig = {
   },
   experimental: {
     serverActions: {
-      bodySizeLimit: '2mb'
+      // Must exceed the 25 MB upload cap (MAX_FILE_SIZE) plus form overhead.
+      bodySizeLimit: '30mb'
     }
   }
 };

@@ -17,8 +17,10 @@ export function isEnumValue<T extends Record<string, string>>(enumObj: T, value:
   return Object.values(enumObj).includes(value);
 }
 
-export const getFileUrl = (fileId: string) => `https://drive.google.com/file/d/${fileId}/view?usp=sharing`
-export const getFileDownloadUrl = (fileId: string) => `https://drive.google.com/uc?export=download&id=${fileId}`
+export const getFileUrl = (driveId: string) => `https://drive.google.com/file/d/${driveId}/view`
+// `confirm=t` skips Google's "can't scan for viruses" interstitial on larger files.
+export const getFileDownloadUrl = (driveId: string) =>
+  `https://drive.usercontent.google.com/download?id=${driveId}&export=download&confirm=t`
 
 export const fileTypeLabels: { [key in FileType]: string } = {
   [FileType.Lecture]: "Lecture",
@@ -37,3 +39,7 @@ export function getCurrentAcademicYear() {
 }
 
 export const PAGE_SIZE = 24;
+
+// Max upload size for contributed files (lectures, worksheets, exams are PDFs).
+export const MAX_FILE_SIZE_MB = 25;
+export const MAX_FILE_SIZE = MAX_FILE_SIZE_MB * 1024 * 1024;

@@ -2,13 +2,11 @@
 
 import { ParsedSearchParams } from "@/app/(home)/browse/page"
 import { auth, signOut } from "@/lib/auth"
-import ENV from "@/lib/env"
 import { FormState, fromErrorToFormState, toFormState } from "@/lib/form-state"
-import { drive } from "@/lib/google-drive"
+import { uploadPublicFile } from "@/lib/google-drive"
 import { prisma } from "@/lib/prisma"
-import { getCurrentAcademicYear, PAGE_SIZE } from "@/lib/utils"
+import { getCurrentAcademicYear, MAX_FILE_SIZE, MAX_FILE_SIZE_MB, PAGE_SIZE } from "@/lib/utils"
 import { AcademicLevel, FileStatus, FileType, Semester } from "@prisma/client"
-import fs from "fs"
 import { revalidatePath } from "next/cache"
 import { z } from "zod"
 
@@ -98,6 +96,7 @@ const UploadFormSchema = z.object({
     .instanceof(File)
     .refine(f => f.size, 'Please provide a file.')
     .refine(file => file.type === 'application/pdf', 'Only PDF files are allowed.')
+    .refine(file => file.size <= MAX_FILE_SIZE, `File must be ${MAX_FILE_SIZE_MB} MB or smaller.`)
 })
 
 export async function uploadFile(state: FormState, formData: FormData): Promise<FormState> {
@@ -127,36 +126,11 @@ export async function uploadFile(state: FormState, formData: FormData): Promise<
       file: formData.get('file'),
     });
 
-    const bytes = await file.arrayBuffer();
-    const buffer = Buffer.from(bytes);
-    const tempPath = `/tmp/${file.name}`;
-    fs.writeFileSync(tempPath, buffer);
+    const buffer = Buffer.from(await file.arrayBuffer());
+    const fileName = `${metadata.type} ${metadata.module} ${metadata.major} ${metadata.academicLevel} S-${metadata.section}${metadata.group ? `G-${metadata.group}` : ''} ${metadata.academicYear}.pdf`;
 
-    // Upload file to Google Drive
-    const fileUploadResponse = await drive.files.create({
-      requestBody: {
-        name: `${metadata.type} ${metadata.module} ${metadata.major} ${metadata.academicLevel} S-${metadata.section}${metadata.group ? `G-${metadata.group}` : ''} ${metadata.academicYear}.pdf`,
-        parents: [ENV.GOOGLE_DRIVE_FOLDER_ID],
-      },
-      media: {
-        mimeType: "application/pdf",
-        body: fs.createReadStream(tempPath),
-      },
-      fields: "id",
-    });
-
-    // Get the uploaded file ID
-    const fileId = fileUploadResponse.data.id;
-    if (!fileId) throw new Error("File upload failed.");
-
-    // Make file publicly accessible
-    await drive.permissions.create({
-      fileId,
-      requestBody: {
-        role: "reader",
-        type: "anyone",
-      },
-    });
+    // Upload to Drive and make it public (the app's status flag controls listing, not access).
+    const fileId = await uploadPublicFile(buffer, fileName);
 
     await prisma.pendingFile.create({
       data: {
@@ -174,7 +148,6 @@ export async function uploadFile(state: FormState, formData: FormData): Promise<
       }
     })
 
-    fs.unlinkSync(tempPath);
     revalidatePath("/contribute");
 
     return toFormState('SUCCESS', formData, {
