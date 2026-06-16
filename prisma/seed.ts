@@ -4,12 +4,23 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 import { getCurrentAcademicYear } from '@/lib/utils';
+import { PrismaBetterSqlite3 } from '@prisma/adapter-better-sqlite3';
 import { faker } from '@faker-js/faker';
-import { FileStatus, PrismaClient } from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
 
-const prisma = new PrismaClient();
+const adapter = new PrismaBetterSqlite3({
+  url: process.env.DATABASE_URL ?? 'file:./prisma/dev.db',
+});
+const prisma = new PrismaClient({ adapter });
 
 async function main() {
+  // Ensure the uploader exists (File/PendingFile reference it via FK).
+  await prisma.user.upsert({
+    where: { email: 'tkthoussam@gmail.com' },
+    update: {},
+    create: { email: 'tkthoussam@gmail.com', name: 'Houssam' },
+  });
+
   // Create dummy professors
   const professors = await Promise.all(
     Array.from({ length: 5 }).map(() =>

@@ -2,7 +2,7 @@ import { z } from "zod";
 
 const envSchema = z.object({
   // Prisma
-  DATABASE_URL: z.string().url(),
+  DATABASE_URL: z.string().min(1),
 
   // Auth.js
   AUTH_GOOGLE_ID: z.string().min(1),
