@@ -47,42 +47,46 @@ export function createPendingFile(data: NewPendingFile) {
  * Major/Module/Professor on demand, then marks the submission Approved.
  */
 export async function approvePendingFile(id: string) {
-  const pendingFile = await prisma.pendingFile.findUniqueOrThrow({ where: { id } });
+  // Atomic: either the File is created and the submission is marked Approved,
+  // or neither happens — never a duplicate File with a still-Pending row.
+  await prisma.$transaction(async (tx) => {
+    const pendingFile = await tx.pendingFile.findUniqueOrThrow({ where: { id } });
 
-  await prisma.file.create({
-    data: {
-      driveId: pendingFile.driveId,
-      type: pendingFile.type,
-      academicLevel: pendingFile.academicLevel,
-      academicYear: pendingFile.academicYear,
-      semester: pendingFile.semester,
-      section: pendingFile.section,
-      group: pendingFile.group,
-      major: {
-        connectOrCreate: {
-          where: { name: pendingFile.majorName },
-          create: { name: pendingFile.majorName },
+    await tx.file.create({
+      data: {
+        driveId: pendingFile.driveId,
+        type: pendingFile.type,
+        academicLevel: pendingFile.academicLevel,
+        academicYear: pendingFile.academicYear,
+        semester: pendingFile.semester,
+        section: pendingFile.section,
+        group: pendingFile.group,
+        major: {
+          connectOrCreate: {
+            where: { name: pendingFile.majorName },
+            create: { name: pendingFile.majorName },
+          },
         },
-      },
-      module: {
-        connectOrCreate: {
-          where: { name: pendingFile.moduleName },
-          create: { name: pendingFile.moduleName },
+        module: {
+          connectOrCreate: {
+            where: { name: pendingFile.moduleName },
+            create: { name: pendingFile.moduleName },
+          },
         },
-      },
-      professor: {
-        connectOrCreate: {
-          where: { fullName: pendingFile.professorFullName },
-          create: { fullName: pendingFile.professorFullName },
+        professor: {
+          connectOrCreate: {
+            where: { fullName: pendingFile.professorFullName },
+            create: { fullName: pendingFile.professorFullName },
+          },
         },
+        uploadedBy: { connect: { email: pendingFile.uploadedByEmail } },
       },
-      uploadedBy: { connect: { email: pendingFile.uploadedByEmail } },
-    },
-  });
+    });
 
-  await prisma.pendingFile.update({
-    where: { id },
-    data: { status: FileStatus.Approved },
+    await tx.pendingFile.update({
+      where: { id },
+      data: { status: FileStatus.Approved },
+    });
   });
 }
 

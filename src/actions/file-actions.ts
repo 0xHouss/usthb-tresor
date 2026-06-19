@@ -68,7 +68,7 @@ export async function approveFile(fileId: string) {
   try {
     await approvePendingFile(fileId)
 
-    revalidatePath("/dashboard")
+    revalidatePath("/submissions")
     revalidatePath("/browse")
     return { success: true }
   } catch (error) {
@@ -83,7 +83,7 @@ export async function rejectFile(fileId: string) {
   try {
     await rejectPendingFile(fileId)
 
-    revalidatePath("/dashboard")
+    revalidatePath("/submissions")
     revalidatePath("/browse")
     return { success: true }
   } catch (error) {
