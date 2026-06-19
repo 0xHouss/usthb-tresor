@@ -20,7 +20,7 @@ Tests are unit-only (Node env, Vitest), matched by `src/**/*.test.ts`.
 
 ## Stack notes
 
-- **Prisma 7** with the **better-sqlite3 driver adapter** (`@prisma/adapter-better-sqlite3`) — SQLite for dev. This is a driver-adapter setup, not Prisma's built-in engine; the `prisma-driver-adapter-implementation` skill is the reference for adapter work. Schema/seed/migration config lives in `prisma.config.ts`.
+- **Prisma 7** with the **pg driver adapter** (`@prisma/adapter-pg`) — PostgreSQL (also for local dev). This is a driver-adapter setup, not Prisma's built-in engine; the `prisma-driver-adapter-implementation` skill is the reference for adapter work. Schema/seed/migration config lives in `prisma.config.ts`. The connection string comes from `DATABASE_URL`.
 - **NextAuth.js v5 (beta)** with Google OAuth via `@auth/prisma-adapter`.
 - **Tailwind v4** — CSS-first config in `src/app/globals.css` (`@import "tailwindcss"`, `@theme`, `@plugin`); there is no `tailwind.config`. shadcn/ui (new-york style); use the `shadcn` skill when adding components.
 - Path alias `@/*` → `./src/*`.
