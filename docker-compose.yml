@@ -1,0 +1,30 @@
+# Local PostgreSQL for development.
+# Credentials match DATABASE_URL in .env.example:
+#   postgresql://postgres:postgres@localhost:5432/usthb_tresor
+#
+# Usage:
+#   docker compose up -d        # start in the background
+#   docker compose down         # stop (keeps data)
+#   docker compose down -v      # stop and wipe the database volume
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: usthb-tresor-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: usthb_tresor
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d usthb_tresor"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres-data:
