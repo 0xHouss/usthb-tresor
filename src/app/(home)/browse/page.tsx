@@ -3,48 +3,12 @@ import { FileFilterSidebar } from "@/components/file-filter-sidebar";
 import NoDataIllustration from "@/components/svg/no-data";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { fileTypeLabels, getFileDownloadUrl, getFileUrl, isEnumValue, PAGE_SIZE } from "@/lib/utils";
-import { AcademicLevel, FileType, Semester } from "@prisma/client";
-import { DownloadIcon } from "lucide-react";
-import Link from "next/link";
+import { PAGE_SIZE } from "@/lib/utils";
+import { parseSearchParams, type SearchParams } from "@/lib/search-params";
 import { PaginationWithLinks } from "../../../components/pagination-with-links";
 import ResourceCard from "@/components/resource-card";
 
-export type SearchParams = Promise<{
-  semester?: string;
-  majors?: string;
-  section?: string;
-  group?: string;
-  startYear?: string;
-  endYear?: string;
-  academicLevels?: string;
-  professors?: string;
-  types?: string;
-  modules?: string;
-  page?: string
-} & URLSearchParams>
-
-async function parseSearchParams(params: SearchParams) {
-  const { academicLevels, semester, majors, section, group, startYear, endYear, professors, modules, types, page } = await params;
-
-  const parsedParams = {
-    semester: semester ? isEnumValue(Semester, semester) ? semester : undefined : undefined,
-    majors: majors?.length ? majors.split(",") : undefined,
-    section,
-    group,
-    startYear: startYear ? parseInt(startYear) : undefined,
-    endYear: endYear ? parseInt(endYear) : undefined,
-    academicLevels: academicLevels?.length ? academicLevels.split(",").filter(l => isEnumValue(AcademicLevel, l)) : undefined,
-    professors: professors?.length ? professors.split(",") : undefined,
-    types: types?.length ? types.split(",").filter(t => isEnumValue(FileType, t)) : undefined,
-    modules: modules?.length ? modules.split(",") : undefined,
-    page: page && !isNaN(parseInt(page)) ? parseInt(page) : 1,
-  };
-
-  return parsedParams;
-}
-
-export type ParsedSearchParams = Awaited<ReturnType<typeof parseSearchParams>>;
+export type { SearchParams, ParsedSearchParams } from "@/lib/search-params";
 
 export default async function BrowsePage(props: { searchParams: SearchParams }) {
   const searchParams = await parseSearchParams(props.searchParams);

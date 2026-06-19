@@ -1,14 +1,14 @@
 "use server"
 
-import { ParsedSearchParams } from "@/app/(home)/browse/page"
+import { ParsedSearchParams } from "@/lib/search-params"
 import { auth, signOut } from "@/lib/auth"
 import { FormState, fromErrorToFormState, toFormState } from "@/lib/form-state"
 import { uploadPublicFile } from "@/lib/google-drive"
 import { prisma } from "@/lib/prisma"
-import { getCurrentAcademicYear, MAX_FILE_SIZE, MAX_FILE_SIZE_MB, PAGE_SIZE } from "@/lib/utils"
-import { AcademicLevel, FileStatus, FileType, Semester } from "@prisma/client"
+import { UploadFormSchema } from "@/lib/schemas/upload-schema"
+import { getCurrentAcademicYear, PAGE_SIZE } from "@/lib/utils"
+import { FileStatus, Prisma } from "@prisma/client"
 import { revalidatePath } from "next/cache"
-import { z } from "zod"
 
 export const getMajors = prisma.major.findMany;
 export const getProfessors = prisma.professor.findMany;
@@ -40,64 +40,32 @@ export async function getAcademicYearRange() {
 }
 
 export async function getFiles({ academicLevels, modules, majors, professors, startYear, endYear, semester, types, group, section, page }: ParsedSearchParams) {
-  const files = await prisma.file.findMany({
-    where: {
-      moduleName: modules?.length ? { in: modules } : undefined,
-      professorFullName: professors?.length ? { in: professors } : undefined,
-      academicLevel: academicLevels?.length ? { in: academicLevels } : undefined,
-      semester: semester ? { equals: semester } : undefined,
-      type: types?.length ? { in: types } : undefined,
-      majorName: majors?.length ? { in: majors } : undefined,
-      academicYear: {
-        gte: startYear,
-        lte: endYear,
-      },
-      section: { equals: section },
-      group: { equals: group },
+  const where: Prisma.FileWhereInput = {
+    moduleName: modules?.length ? { in: modules } : undefined,
+    professorFullName: professors?.length ? { in: professors } : undefined,
+    academicLevel: academicLevels?.length ? { in: academicLevels } : undefined,
+    semester: semester ? { equals: semester } : undefined,
+    type: types?.length ? { in: types } : undefined,
+    majorName: majors?.length ? { in: majors } : undefined,
+    academicYear: {
+      gte: startYear,
+      lte: endYear,
     },
-    take: PAGE_SIZE,
-    skip: (page - 1) * PAGE_SIZE,
-  });
+    section: { equals: section },
+    group: { equals: group },
+  };
 
-  const totalCount = await prisma.file.count({
-    where: {
-      moduleName: modules?.length ? { in: modules } : undefined,
-      professorFullName: professors?.length ? { in: professors } : undefined,
-      academicLevel: academicLevels?.length ? { in: academicLevels } : undefined,
-      semester: semester ? { equals: semester } : undefined,
-      type: types?.length ? { in: types } : undefined,
-      majorName: majors?.length ? { in: majors } : undefined,
-      academicYear: {
-        gte: startYear ? startYear : undefined,
-        lte: endYear ? endYear : undefined,
-      },
-      section: { equals: section },
-      group: { equals: group },
-    }
-  });
+  const [files, totalCount] = await Promise.all([
+    prisma.file.findMany({
+      where,
+      take: PAGE_SIZE,
+      skip: (page - 1) * PAGE_SIZE,
+    }),
+    prisma.file.count({ where }),
+  ]);
 
   return { files, totalCount };
 }
-
-const UploadFormSchema = z.object({
-  major: z.string(),
-  academicLevel: z.string({ message: 'Please select an option.' }).min(1, 'Please select an option.').pipe(z.nativeEnum(AcademicLevel, { message: 'Please select a valid option.' })),
-  section: z.string(),
-  group: z.string(),
-  academicYear: z
-    .string()
-    .regex(/^\d{4}\/\d{4}$/, "Academic year must be in format YYYY/YYYY")
-    .refine(y => +y.split("/")[1] === +y.split("/")[0] + 1, "The second year must be the first year plus one."),
-  semester: z.string({ message: 'Please select an option.' }).min(1, 'Please select an option.').pipe(z.nativeEnum(Semester, { message: 'Please select a valid option.' })),
-  module: z.string(),
-  professor: z.string(),
-  type: z.string({ message: 'Please select an option.' }).min(1, 'Please select an option.').pipe(z.nativeEnum(FileType, { message: 'Please select a valid option.' })),
-  file: z
-    .instanceof(File)
-    .refine(f => f.size, 'Please provide a file.')
-    .refine(file => file.type === 'application/pdf', 'Only PDF files are allowed.')
-    .refine(file => file.size <= MAX_FILE_SIZE, `File must be ${MAX_FILE_SIZE_MB} MB or smaller.`)
-})
 
 export async function uploadFile(state: FormState, formData: FormData): Promise<FormState> {
   try {

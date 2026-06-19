@@ -13,8 +13,8 @@ export function getInitials(name: string) {
   return initials || "?";
 }
 
-export function isEnumValue<T extends Record<string, string>>(enumObj: T, value: string): value is T[keyof T] {
-  return Object.values(enumObj).includes(value);
+export function isEnumValue<T extends Record<string, string>>(enumObj: T, value: string | null | undefined): value is T[keyof T] {
+  return value != null && Object.values(enumObj).includes(value);
 }
 
 export const getFileUrl = (driveId: string) => `https://drive.google.com/file/d/${driveId}/view`
