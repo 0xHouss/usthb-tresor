@@ -18,7 +18,8 @@ import ResourceCard from "@/components/resource-card";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import { auth } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
+import { getFileStats, getRecentFiles } from "@/dal/files";
+import { getMajors } from "@/dal/taxonomy";
 import { cn, fileTypeLabels } from "@/lib/utils";
 import { FileType } from "@prisma/client";
 
@@ -53,22 +54,12 @@ function Section({ className, ...props }: ComponentPropsWithoutRef<"section">) {
   return <section className={cn("max-w-[1200px] w-full m-auto px-4", className)} {...props} />;
 }
 
-async function getStats() {
-  const [resources, majors, modules, contributors] = await Promise.all([
-    prisma.file.count(),
-    prisma.major.count(),
-    prisma.module.count(),
-    prisma.file.findMany({ distinct: ["uploadedByEmail"], select: { uploadedByEmail: true } }),
-  ]);
-  return { resources, majors, modules, contributors: contributors.length };
-}
-
 export default async function Home() {
   const [session, stats, majors, recent] = await Promise.all([
     auth(),
-    getStats(),
-    prisma.major.findMany({ orderBy: { name: "asc" } }),
-    prisma.file.findMany({ orderBy: { uploadedAt: "desc" }, take: 6 }),
+    getFileStats(),
+    getMajors(),
+    getRecentFiles(6),
   ]);
 
   const statItems = [

@@ -1,4 +1,5 @@
-import { getAcademicYearRange, getFiles, getMajors, getModules, getProfessors } from "@/actions/file-actions";
+import { getAcademicYearRange, getFiles } from "@/dal/files";
+import { getMajors, getModules, getProfessors } from "@/dal/taxonomy";
 import { FileFilterSidebar } from "@/components/file-filter-sidebar";
 import NoDataIllustration from "@/components/svg/no-data";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";

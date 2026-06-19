@@ -1,6 +1,6 @@
 "use client"
 
-import { getAcademicYearRange } from "@/actions/file-actions"
+import type { AcademicYearRange } from "@/dal/files"
 import { ParsedSearchParams } from "@/app/(home)/browse/page"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 import { Badge } from "@/components/ui/badge"
@@ -64,7 +64,7 @@ interface FileFilterSidebarProps {
   majors: Major[]
   professors: Professor[]
   modules: Module[]
-  academicYearRange: Awaited<ReturnType<typeof getAcademicYearRange>>
+  academicYearRange: AcademicYearRange
 }
 
 export function FileFilterSidebar({ searchParams, majors, modules, professors, academicYearRange: { minYear, maxYear } }: FileFilterSidebarProps) {
