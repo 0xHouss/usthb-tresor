@@ -1,4 +1,4 @@
-import { getMajors, getModules, getProfessors } from "@/actions/file-actions";
+import { getMajors, getModules, getProfessors } from "@/dal/taxonomy";
 import { ContributeForm } from "./contribute-form";
 
 export default async function ContributePage() {
