@@ -1,5 +1,5 @@
 import type { PublicFile } from "@/dal/files";
-import { fileTypeLabels, getFileDownloadUrl } from "@/lib/utils";
+import { fileTypeLabels } from "@/lib/utils";
 import { DownloadIcon } from "lucide-react";
 
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
@@ -14,9 +14,10 @@ export default function ResourceCard({file}: ResourceCardProps) {
     <Card className="relative">
       <CardHeader className="flex flex-row justify-between">
         <div className="flex items-center gap-4">
-          <Link href={getFileDownloadUrl(file.driveId)} className="rounded-md bg-muted p-6 cursor-pointer" >
+          {/* A plain <a>: prefetching the download route would count phantom downloads. */}
+          <a href={`/api/files/${file.id}/download`} className="rounded-md bg-muted p-6 cursor-pointer" aria-label="Télécharger">
             <DownloadIcon className="w-5 h-5" />
-          </Link>
+          </a>
           <div className="space-y-1">
             <p className="text-muted-foreground text-xs font-normal">{file.academicYear}/{file.academicYear + 1}</p>
             <CardTitle className="truncate hover:underline text-lg/[1em]">

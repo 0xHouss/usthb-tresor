@@ -179,8 +179,9 @@ model File {
   uploadedBy      User   @relation(fields: [uploadedByEmail], references: [email])
   uploadedByEmail String
 
-  comments Comment[]
-  reports  Report[]
+  comments  Comment[]
+  reports   Report[]
+  downloads FileDownload[]
 }
 
 model Professor {
@@ -202,6 +203,20 @@ model Major {
   name String @unique
 
   File File[]
+}
+
+// Download tracking. Deliberately anonymous: no user is stored.
+
+model FileDownload {
+  id String @id @default(cuid())
+
+  file   File   @relation(fields: [fileId], references: [id], onDelete: Cascade)
+  fileId String
+
+  createdAt DateTime @default(now())
+
+  @@index([fileId])
+  @@index([createdAt])
 }
 
 // Comments

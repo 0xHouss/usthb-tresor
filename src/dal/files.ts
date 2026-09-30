@@ -97,3 +97,15 @@ export async function getFiles({
 
   return { files, totalCount };
 }
+
+/**
+ * Counts a download of a published file and returns its Drive id, or null if
+ * it doesn't exist. Downloads are anonymous: no user is recorded.
+ */
+export async function recordDownload(fileId: string) {
+  const file = await prisma.file.findUnique({ where: { id: fileId }, select: { driveId: true } });
+  if (!file) return null;
+
+  await prisma.fileDownload.create({ data: { fileId } });
+  return file.driveId;
+}

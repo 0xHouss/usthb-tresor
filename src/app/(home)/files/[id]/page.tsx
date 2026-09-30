@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { getComments } from "@/dal/comments"
 import { getFile } from "@/dal/files"
 import { getCurrentUser } from "@/dal/session"
-import { fileTypeLabels, formatDateTime, getFileDownloadUrl, getFileUrl } from "@/lib/utils"
+import { fileTypeLabels, formatDateTime, getFileUrl } from "@/lib/utils"
 import { ArrowLeftIcon, DownloadIcon, SquareArrowOutUpRightIcon } from "lucide-react"
 import type { Metadata } from "next"
 import Link from "next/link"
@@ -61,10 +61,11 @@ export default async function FilePage({ params }: FilePageProps) {
 
         <div className="flex flex-col gap-4">
           <div className="flex flex-col gap-2">
-            <Link href={getFileDownloadUrl(file.driveId)} className={buttonVariants()}>
+            {/* A plain <a>: prefetching the download route would count phantom downloads. */}
+            <a href={`/api/files/${file.id}/download`} className={buttonVariants()}>
               <DownloadIcon />
               Télécharger
-            </Link>
+            </a>
             <Link href={getFileUrl(file.driveId)} target="_blank" className={buttonVariants({ variant: "outline" })}>
               <SquareArrowOutUpRightIcon />
               Ouvrir dans Drive
