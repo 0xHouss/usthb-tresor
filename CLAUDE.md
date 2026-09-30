@@ -34,5 +34,7 @@ Tests are unit-only (Node env, Vitest), matched by `src/**/*.test.ts`.
 
 ## Conventions
 
+- **Branches:** feature branches off `dev`, merged into `dev` via PR when the feature is done; `dev` is merged into `main` via PR once a meaningful batch of features is tested. Don't commit directly to `main`.
+- **UI language:** all user-facing text is in French for now (a fr/en language selector is planned later).
 - Conventional commits with scopes, e.g. `feat(storage):`, `fix(ui/browse-page):`.
 - Do **not** add `Co-Authored-By` trailers to commit messages.
