@@ -1,11 +1,11 @@
 import { logout } from '@/actions/auth-actions'
 import { getInitials } from '@/lib/utils'
-import { User } from 'next-auth'
+import type { SessionUser } from '@/lib/auth'
 import Image from 'next/image'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from './ui/dropdown-menu'
 
 interface UserButtonProps {
-  user: User
+  user: SessionUser
 }
 
 export default function UserButton({ user }: UserButtonProps) {

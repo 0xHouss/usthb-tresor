@@ -1,8 +1,6 @@
 "use server"
 
-import { signOut } from "@/lib/auth"
 import { requireModerator, requireUser } from "@/dal/session"
-import { getUserByEmail } from "@/dal/users"
 import { approvePendingFile, createPendingFile, rejectPendingFile } from "@/dal/pending-files"
 import { FormState, fromErrorToFormState, toFormState } from "@/lib/form-state"
 import { uploadPublicFile } from "@/lib/google-drive"
@@ -12,9 +10,6 @@ import { revalidatePath } from "next/cache"
 export async function uploadFile(state: FormState, formData: FormData): Promise<FormState> {
   try {
     const user = await requireUser();
-
-    const dbUser = await getUserByEmail(user.email);
-    if (!dbUser) signOut({ redirectTo: '/login' });
 
     const { file, ...metadata } = UploadFormSchema.parse({
       major: formData.get('major'),

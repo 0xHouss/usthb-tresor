@@ -4,10 +4,11 @@ const envSchema = z.object({
   // Prisma
   DATABASE_URL: z.string().min(1),
 
-  // Auth.js
+  // Better Auth
   AUTH_GOOGLE_ID: z.string().min(1),
   AUTH_GOOGLE_SECRET: z.string().min(1),
-  AUTH_SECRET: z.string().min(1),
+  BETTER_AUTH_SECRET: z.string().min(32),
+  BETTER_AUTH_URL: z.url(),
 
   // Google Drive
   GOOGLE_DRIVE_FOLDER_ID: z.string().min(1),

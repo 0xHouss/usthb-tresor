@@ -1,4 +1,4 @@
-import { auth } from "@/lib/auth"
+import { getCurrentUser } from "@/dal/session"
 import Image from "next/image"
 import Link from "next/link"
 import MobileHeaderMenu from "./mobile-header-menu"
@@ -7,8 +7,7 @@ import { buttonVariants } from "./ui/button"
 import UserButton from "./user-button"
 
 export async function Header() {
-  const session = await auth()
-  const user = session?.user;
+  const user = await getCurrentUser()
 
   return (
     <header className="sticky top-0 border-b-2 bg-background z-50">

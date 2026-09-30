@@ -4,10 +4,10 @@ import { cn } from '@/lib/utils'
 import { Link, Menu, X } from 'lucide-react'
 import { Button } from './ui/button'
 import { useState } from 'react';
-import { User } from 'next-auth';
+import type { SessionUser } from '@/lib/auth';
 
 interface MobileHeaderMenuProps {
-  user: User | undefined;
+  user: SessionUser | null;
 }
 
 export default function MobileHeaderMenu({ user }: MobileHeaderMenuProps) {
