@@ -25,3 +25,12 @@ export async function requireModerator() {
   }
   return user;
 }
+
+/** Asserts the caller is an Admin; throws otherwise. */
+export async function requireAdmin() {
+  const user = await requireUser();
+  if (user.role !== "Admin") {
+    throw new Error("Insufficient permissions");
+  }
+  return user;
+}

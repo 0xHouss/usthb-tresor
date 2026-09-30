@@ -21,6 +21,9 @@ const toInt = (value: string | undefined) => {
   return isNaN(n) ? undefined : n;
 };
 
+// Parses a 1-based page number, falling back to the first page.
+export const parsePage = (value: string | undefined) => Math.max(1, toInt(value) ?? 1);
+
 export async function parseSearchParams(params: SearchParams) {
   const { academicLevels, semester, majors, section, group, startYear, endYear, professors, modules, types, page } = await params;
 
@@ -35,7 +38,7 @@ export async function parseSearchParams(params: SearchParams) {
     professors: professors?.length ? professors.split(",") : undefined,
     types: types?.length ? types.split(",").filter(t => isEnumValue(FileType, t)) : undefined,
     modules: modules?.length ? modules.split(",") : undefined,
-    page: Math.max(1, toInt(page) ?? 1),
+    page: parsePage(page),
   };
 
   return parsedParams;

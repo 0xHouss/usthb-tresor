@@ -30,6 +30,10 @@ export async function Header() {
             {["Admin", "Moderator"].includes(user?.role || "Visitor") && (
               <NavLink href="/submissions" label="Submissions" />
             )}
+
+            {user?.role === "Admin" && (
+              <NavLink href="/admin/logs" label="Administration" />
+            )}
           </div>
         </div>
 

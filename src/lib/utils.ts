@@ -38,6 +38,15 @@ export function getCurrentAcademicYear() {
   return now.getMonth() < 7 ? now.getFullYear() - 1 : now.getFullYear();
 }
 
+const dateTimeFormat = new Intl.DateTimeFormat("fr-FR", {
+  dateStyle: "short",
+  timeStyle: "short",
+  timeZone: "Africa/Algiers",
+});
+
+// Pinned to Algiers time so server-rendered dates don't depend on the host's timezone.
+export const formatDateTime = (date: Date) => dateTimeFormat.format(date);
+
 export const PAGE_SIZE = 24;
 
 // Max upload size for contributed files (lectures, worksheets, exams are PDFs).

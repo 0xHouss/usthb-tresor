@@ -47,14 +47,15 @@ export function createPendingFile(data: NewPendingFile) {
 /**
  * Promotes a pending submission to an approved `File`, creating the referenced
  * Major/Module/Professor on demand, then marks the submission Approved.
+ * Returns the new `File`.
  */
 export async function approvePendingFile(id: string) {
   // Atomic: either the File is created and the submission is marked Approved,
   // or neither happens — never a duplicate File with a still-Pending row.
-  await prisma.$transaction(async (tx) => {
+  return prisma.$transaction(async (tx) => {
     const pendingFile = await tx.pendingFile.findUniqueOrThrow({ where: { id } });
 
-    await tx.file.create({
+    const file = await tx.file.create({
       data: {
         driveId: pendingFile.driveId,
         type: pendingFile.type,
@@ -90,6 +91,8 @@ export async function approvePendingFile(id: string) {
       where: { id },
       data: { status: FileStatus.Approved },
     });
+
+    return file;
   });
 }
 

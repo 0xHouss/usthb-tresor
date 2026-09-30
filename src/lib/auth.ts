@@ -26,6 +26,17 @@ export const auth = betterAuth({
       },
     },
   },
+  databaseHooks: {
+    session: {
+      create: {
+        // Every new session is a sign-in. Imported lazily: the DAL imports this module.
+        after: async (session) => {
+          const { logEvent } = await import("@/dal/events")
+          await logEvent({ type: "UserLogin", actorId: session.userId })
+        },
+      },
+    },
+  },
   // Must stay last so cookies set by auth.api calls in Server Actions reach the browser.
   plugins: [nextCookies()],
 })

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { parseSearchParams, type SearchParams } from "./search-params";
+import { parsePage, parseSearchParams, type SearchParams } from "./search-params";
 
 // The function awaits its argument, so a plain object satisfies the Promise type.
 const parse = (params: Record<string, string>) =>
@@ -77,5 +77,22 @@ describe("parseSearchParams", () => {
     const result = await parse({ section: "A", group: "2" });
     expect(result.section).toBe("A");
     expect(result.group).toBe("2");
+  });
+});
+
+describe("parsePage", () => {
+  it("defaults to 1 when missing or non-numeric", () => {
+    expect(parsePage(undefined)).toBe(1);
+    expect(parsePage("")).toBe(1);
+    expect(parsePage("abc")).toBe(1);
+  });
+
+  it("parses a valid page number", () => {
+    expect(parsePage("3")).toBe(3);
+  });
+
+  it("clamps zero or negative values to 1", () => {
+    expect(parsePage("0")).toBe(1);
+    expect(parsePage("-2")).toBe(1);
   });
 });

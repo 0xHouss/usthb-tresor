@@ -29,6 +29,7 @@ model User {
 
   File File[]
   PendingFile PendingFile[]
+  events      EventLog[]
 }
 
 model Account {
@@ -194,4 +195,33 @@ model Major {
   name String @unique
 
   File File[]
+}
+
+// Audit log
+
+enum EventType {
+  UserLogin
+  FileSubmitted
+  FileApproved
+  FileRejected
+}
+
+model EventLog {
+  id   String    @id @default(cuid())
+  type EventType
+
+  // Who performed the action; kept null if that user is later deleted.
+  actor   User?   @relation(fields: [actorId], references: [id], onDelete: SetNull)
+  actorId String?
+
+  // Id of the record the event is about (PendingFile, File, ...), if any.
+  targetId String?
+  // Snapshot of the target's details, so the entry still reads well if it's deleted.
+  metadata Json?
+
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([type, createdAt])
+  @@index([actorId])
 }
