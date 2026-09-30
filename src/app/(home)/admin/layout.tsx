@@ -7,6 +7,7 @@ type AdminSection = { href: string; label: string; roles: SessionUser["role"][] 
 
 // Each admin page registers its entry here; pages still enforce their own role checks.
 const sections: AdminSection[] = [
+  { href: "/admin/reports", label: "Signalements", roles: ["Admin", "Moderator"] },
   { href: "/admin/logs", label: "Journal", roles: ["Admin"] },
 ]
 

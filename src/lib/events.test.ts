@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { commentEventMetadata, describeEvent, excerpt, fileEventMetadata } from "./events";
+import { commentEventMetadata, describeEvent, describeFile, excerpt, fileEventMetadata, reportEventMetadata } from "./events";
 
 describe("fileEventMetadata", () => {
   it("snapshots the file's identifying details", () => {
@@ -36,6 +36,11 @@ describe("describeEvent", () => {
     );
   });
 
+  it("labels report reasons", () => {
+    const file = { fileType: "Exam", module: "Algo", academicLevel: "L1" } as const;
+    expect(describeEvent(reportEventMetadata(file, "Copyright"))).toBe("Exam · Algo · L1 · Droits d'auteur");
+  });
+
   it("returns an empty string for missing or unknown metadata", () => {
     expect(describeEvent(null)).toBe("");
     expect(describeEvent({ foo: "bar" })).toBe("");
@@ -63,5 +68,17 @@ describe("commentEventMetadata", () => {
     const file = { type: "Exam", moduleName: "Algo", academicLevel: "L1" } as const;
     expect(commentEventMetadata(file, "ok")).not.toHaveProperty("moderated");
     expect(commentEventMetadata(file, "ok", { moderated: true })).toHaveProperty("moderated", true);
+  });
+});
+
+describe("describeFile", () => {
+  it("describes the file without event-specific details", () => {
+    expect(
+      describeFile({ fileType: "Exam", module: "Algo", academicLevel: "L1", anonymous: true, reason: "Other" })
+    ).toBe("Exam · Algo · L1");
+  });
+
+  it("returns an empty string for unknown metadata", () => {
+    expect(describeFile(null)).toBe("");
   });
 });

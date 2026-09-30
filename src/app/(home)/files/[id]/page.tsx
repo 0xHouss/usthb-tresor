@@ -11,6 +11,7 @@ import Link from "next/link"
 import { notFound } from "next/navigation"
 import { CommentForm } from "./comment-form"
 import { DeleteCommentButton } from "./delete-comment-button"
+import { ReportFileDialog } from "./report-file-dialog"
 
 type FilePageProps = { params: Promise<{ id: string }> }
 
@@ -96,6 +97,12 @@ export default async function FilePage({ params }: FilePageProps) {
               <p className="text-muted-foreground">Partagé anonymement</p>
             )}
           </div>
+
+          {user && (
+            <div className="self-start">
+              <ReportFileDialog fileId={file.id} />
+            </div>
+          )}
         </div>
       </div>
 

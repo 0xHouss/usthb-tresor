@@ -1,4 +1,5 @@
 import { PaginationWithLinks } from "@/components/pagination-with-links"
+import { SearchParamSelect } from "@/components/search-param-select"
 import { Badge } from "@/components/ui/badge"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { EVENTS_PAGE_SIZE, getEvents } from "@/dal/events"
@@ -8,7 +9,6 @@ import { parsePage } from "@/lib/search-params"
 import { formatDateTime, isEnumValue } from "@/lib/utils"
 import { EventType } from "@prisma/client"
 import { redirect } from "next/navigation"
-import { EventTypeFilter } from "./event-type-filter"
 
 type LogsSearchParams = Promise<{ type?: string; page?: string }>
 
@@ -31,7 +31,13 @@ export default async function LogsPage(props: { searchParams: LogsSearchParams }
             Connexions et actions de modération ({totalCount} entrée{totalCount !== 1 ? "s" : ""})
           </p>
         </div>
-        <EventTypeFilter value={type} />
+        <SearchParamSelect
+          param="type"
+          value={type}
+          options={Object.values(EventType).map(value => ({ value, label: eventTypeLabels[value] }))}
+          allLabel="Tous les événements"
+          aria-label="Filtrer par type d'événement"
+        />
       </div>
 
       {events.length ? (

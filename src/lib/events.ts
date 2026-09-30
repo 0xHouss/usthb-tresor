@@ -1,4 +1,5 @@
-import { EventType, FileType } from "@prisma/client";
+import { EventType, FileType, ReportReason } from "@prisma/client";
+import { reportReasonLabels } from "./reports";
 import { fileTypeLabels } from "./utils";
 
 // Pure helpers for audit-log entries, shared by the writers (actions, auth hooks)
@@ -11,6 +12,10 @@ export const eventTypeLabels: { [key in EventType]: string } = {
   [EventType.FileRejected]: "Fichier rejeté",
   [EventType.CommentCreated]: "Commentaire publié",
   [EventType.CommentDeleted]: "Commentaire supprimé",
+  [EventType.ReportCreated]: "Signalement",
+  [EventType.ReportResolved]: "Signalement résolu",
+  [EventType.ReportDismissed]: "Signalement rejeté",
+  [EventType.FileDeleted]: "Fichier supprimé",
 };
 
 /** Snapshot of a file's identifying details, stored in an event's metadata. */
@@ -64,24 +69,39 @@ export function commentEventMetadata(
   };
 }
 
-function isFileEventMetadata(value: unknown): value is FileEventMetadata {
+/** Metadata of a report event: the reported file's snapshot plus the report reason. */
+export type ReportEventMetadata = FileEventMetadata & { reason: ReportReason };
+
+export function reportEventMetadata(fileMetadata: FileEventMetadata, reason: ReportReason): ReportEventMetadata {
+  return { ...fileMetadata, reason };
+}
+
+export function isFileEventMetadata(value: unknown): value is FileEventMetadata {
   if (typeof value !== "object" || value === null) return false;
   const v = value as Record<string, unknown>;
   return typeof v.fileType === "string" && typeof v.module === "string";
+}
+
+/** One-line description of a file snapshot, e.g. "Exam · Algo · L1". */
+export function describeFile(metadata: unknown): string {
+  if (!isFileEventMetadata(metadata)) return "";
+
+  return [fileTypeLabels[metadata.fileType] ?? metadata.fileType, metadata.module, metadata.academicLevel]
+    .filter(Boolean)
+    .join(" · ");
 }
 
 /** One-line human description of an event's target, or "" when there is nothing to show. */
 export function describeEvent(metadata: unknown): string {
   if (!isFileEventMetadata(metadata)) return "";
 
-  const parts = [
-    fileTypeLabels[metadata.fileType] ?? metadata.fileType,
-    metadata.module,
-    metadata.academicLevel,
-  ];
+  const parts = [describeFile(metadata)];
   if (metadata.anonymous) parts.push("anonyme");
 
   const v = metadata as Record<string, unknown>;
+  if (typeof v.reason === "string" && v.reason in reportReasonLabels) {
+    parts.push(reportReasonLabels[v.reason as ReportReason]);
+  }
   if (typeof v.excerpt === "string") parts.push(`« ${v.excerpt} »`);
   if (v.moderated === true) parts.push("par la modération");
 
