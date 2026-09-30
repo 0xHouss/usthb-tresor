@@ -48,7 +48,7 @@ Users are assigned one of the following roles, each with specific privileges:
 
 ### 🔑 **Authentication & Authorization**
 
-- **Secure Auth:** Handled with NextAuth.js.
+- **Secure Auth:** Handled with Better Auth.
 - **OAuth Support:** Compatible with providers like Google and GitHub.
 - **Session & Account Management:** Fully integrated via Prisma schema.
 - **Role-Based Access Control:** Enforced on both backend and frontend.
@@ -96,7 +96,7 @@ Users are assigned one of the following roles, each with specific privileges:
 
 #### **Backend**
 - **ORM:** Prisma (SQLite for dev, PostgreSQL for production)
-- **Auth:** NextAuth.js
+- **Auth:** Better Auth
 - **Storage:** Google Drive integration for hosting files
 
 #### **Deployment**

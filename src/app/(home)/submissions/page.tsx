@@ -1,11 +1,10 @@
 import { PendingFilesTable } from "@/components/pending-files-table"
-import { auth } from "@/lib/auth"
+import { getCurrentUser } from "@/dal/session"
 import { getPendingFiles } from "@/dal/pending-files"
 import { redirect } from "next/navigation"
 
 export default async function DashboardPage() {
-  const session = await auth()
-  const user = session?.user
+  const user = await getCurrentUser()
 
   if (!user) {
     redirect("/login")

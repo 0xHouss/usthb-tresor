@@ -1,18 +1,20 @@
 import "server-only";
 
 import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
+import { cache } from "react";
 
-/** Current session user, or null when signed out. */
-export async function getCurrentUser() {
-  const session = await auth();
+/** Current session user, or null when signed out. Deduped per request. */
+export const getCurrentUser = cache(async () => {
+  const session = await auth.api.getSession({ headers: await headers() });
   return session?.user ?? null;
-}
+});
 
-/** Asserts an authenticated user with an email; throws otherwise. */
+/** Asserts an authenticated user; throws otherwise. */
 export async function requireUser() {
   const user = await getCurrentUser();
-  if (!user?.email) throw new Error("Unauthorized");
-  return user as typeof user & { email: string };
+  if (!user) throw new Error("Unauthorized");
+  return user;
 }
 
 /** Asserts the caller is a Moderator or Admin; throws otherwise. */

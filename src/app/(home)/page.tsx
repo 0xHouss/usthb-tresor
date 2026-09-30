@@ -17,8 +17,8 @@ import {
 import ResourceCard from "@/components/resource-card";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
-import { auth } from "@/lib/auth";
 import { getFileStats, getRecentFiles } from "@/dal/files";
+import { getCurrentUser } from "@/dal/session";
 import { getMajors } from "@/dal/taxonomy";
 import { cn, fileTypeLabels } from "@/lib/utils";
 import { FileType } from "@prisma/client";
@@ -55,8 +55,8 @@ function Section({ className, ...props }: ComponentPropsWithoutRef<"section">) {
 }
 
 export default async function Home() {
-  const [session, stats, majors, recent] = await Promise.all([
-    auth(),
+  const [user, stats, majors, recent] = await Promise.all([
+    getCurrentUser(),
     getFileStats(),
     getMajors(),
     getRecentFiles(6),
@@ -90,7 +90,7 @@ export default async function Home() {
             Browse Now
           </Link>
           <Link
-            href={session?.user ? "/contribute" : "/login"}
+            href={user ? "/contribute" : "/login"}
             className={buttonVariants({ variant: "secondary", size: "lg" })}
           >
             Contribute
@@ -195,7 +195,7 @@ export default async function Home() {
             <p className="text-muted-foreground">
               No resources published yet. Be the first to contribute!
             </p>
-            <Link href={session?.user ? "/contribute" : "/login"} className={buttonVariants()}>
+            <Link href={user ? "/contribute" : "/login"} className={buttonVariants()}>
               Contribute a resource
             </Link>
           </div>

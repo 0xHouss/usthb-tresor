@@ -21,7 +21,7 @@ Tests are unit-only (Node env, Vitest), matched by `src/**/*.test.ts`.
 ## Stack notes
 
 - **Prisma 7** with the **pg driver adapter** (`@prisma/adapter-pg`) — PostgreSQL (also for local dev). This is a driver-adapter setup, not Prisma's built-in engine; the `prisma-driver-adapter-implementation` skill is the reference for adapter work. Schema/seed/migration config lives in `prisma.config.ts`. The connection string comes from `DATABASE_URL`.
-- **NextAuth.js v5 (beta)** with Google OAuth via `@auth/prisma-adapter`.
+- **Better Auth** with Google OAuth, via its Prisma adapter (`better-auth/adapters/prisma`) and database sessions. Server config is `src/lib/auth.ts`; the handler is mounted at `src/app/api/auth/[...all]`. Read the session through `src/dal/session.ts` (`getCurrentUser` / `requireUser` / `requireModerator`), not `auth.api.getSession` directly. `role` is a server-owned `user.additionalFields` entry (`input: false`) — change roles only via direct DB writes. Sign-in/out run as Server Actions (`src/actions/auth-actions.ts`), which relies on the `nextCookies()` plugin staying last in `plugins`.
 - **Tailwind v4** — CSS-first config in `src/app/globals.css` (`@import "tailwindcss"`, `@theme`, `@plugin`); there is no `tailwind.config`. shadcn/ui (new-york style); use the `shadcn` skill when adding components.
 - Path alias `@/*` → `./src/*`.
 
@@ -30,7 +30,7 @@ Tests are unit-only (Node env, Vitest), matched by `src/**/*.test.ts`.
 - **ESLint stays on 9.x** — do not bump to 10; the eslint-config-next plugin chain breaks on 10.
 - `eslint.config.mjs` deliberately demotes `react-hooks/set-state-in-effect` and `react-hooks/refs` to warnings so pre-existing patterns (e.g. shadcn `use-mobile`) don't block lint. Don't re-promote them without fixing the underlying code.
 - `next.config.ts` sets Server Action `bodySizeLimit: '30mb'` on purpose — it must stay above the 25 MB upload cap plus form overhead.
-- Required env vars are in `.env.example` (DB, `AUTH_GOOGLE_*`, `AUTH_SECRET`, `GOOGLE_DRIVE_*`). File storage uses Google Drive over OAuth and needs `GOOGLE_DRIVE_REFRESH_TOKEN`.
+- Required env vars are in `.env.example` (DB, `AUTH_GOOGLE_*`, `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`, `GOOGLE_DRIVE_*`). File storage uses Google Drive over OAuth and needs `GOOGLE_DRIVE_REFRESH_TOKEN`.
 
 ## Conventions
 
