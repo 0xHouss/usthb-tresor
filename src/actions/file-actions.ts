@@ -21,6 +21,7 @@ export async function uploadFile(state: FormState, formData: FormData): Promise<
       module: formData.get('module'),
       professor: formData.get('professor'),
       type: formData.get('type'),
+      anonymous: formData.get('anonymous'),
       file: formData.get('file'),
     });
 
@@ -42,6 +43,7 @@ export async function uploadFile(state: FormState, formData: FormData): Promise<
       majorName: metadata.major,
       moduleName: metadata.module,
       professorFullName: metadata.professor,
+      anonymous: metadata.anonymous,
     });
 
     revalidatePath("/contribute");

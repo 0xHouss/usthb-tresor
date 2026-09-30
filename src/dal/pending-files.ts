@@ -16,6 +16,7 @@ export type NewPendingFile = {
   majorName: string;
   moduleName: string;
   professorFullName: string;
+  anonymous: boolean;
 };
 
 /** Pending submissions awaiting review. Moderator/Admin only. */
@@ -37,6 +38,7 @@ export function createPendingFile(data: NewPendingFile) {
       majorName: data.majorName,
       moduleName: data.moduleName,
       professorFullName: data.professorFullName,
+      anonymous: data.anonymous,
       uploadedBy: { connect: { email: data.uploaderEmail } },
     },
   });
@@ -79,6 +81,7 @@ export async function approvePendingFile(id: string) {
             create: { fullName: pendingFile.professorFullName },
           },
         },
+        anonymous: pendingFile.anonymous,
         uploadedBy: { connect: { email: pendingFile.uploadedByEmail } },
       },
     });

@@ -90,6 +90,22 @@ describe("UploadFormSchema", () => {
     });
   });
 
+  describe("anonymous", () => {
+    it("is true when the checkbox is checked", () => {
+      const result = UploadFormSchema.parse({ ...validInput(), anonymous: "on" });
+      expect(result.anonymous).toBe(true);
+    });
+
+    it("is false when the checkbox is unchecked", () => {
+      expect(UploadFormSchema.parse({ ...validInput(), anonymous: null }).anonymous).toBe(false);
+      expect(UploadFormSchema.parse(validInput()).anonymous).toBe(false);
+    });
+
+    it("rejects any other value", () => {
+      expect(errorsFor({ ...validInput(), anonymous: "yes" }, "anonymous").length).toBeGreaterThan(0);
+    });
+  });
+
   describe("enum fields", () => {
     it("rejects an empty selection", () => {
       expect(errorsFor({ ...validInput(), academicLevel: "" }, "academicLevel")).toContain(

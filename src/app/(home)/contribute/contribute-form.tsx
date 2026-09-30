@@ -3,6 +3,7 @@
 import { uploadFile } from "@/actions/file-actions";
 import { CreatableCombobox } from "@/components/creatable-combobox";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -217,6 +218,21 @@ export function ContributeForm({ majors, professors, modules }: ContributeFormPr
         </div>
 
         <ErrorMessage errors={state.fieldErrors.file} />
+      </div>
+
+      <div className="flex items-start gap-3">
+        <Checkbox
+          id="anonymous"
+          name="anonymous"
+          key={state.timestamp}
+          defaultChecked={getPrevValue(state, 'anonymous') === 'on'}
+        />
+        <div className="grid gap-1">
+          <Label htmlFor="anonymous">Publier anonymement</Label>
+          <p className="text-sm text-muted-foreground">
+            Votre nom ne sera pas affiché publiquement. Les modérateurs peuvent toujours voir qui a soumis le fichier.
+          </p>
+        </div>
       </div>
 
       <Button type="submit" disabled={pending} className="w-full">

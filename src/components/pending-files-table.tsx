@@ -5,14 +5,14 @@ import { Badge } from "@/components/ui/badge"
 import { Button, buttonVariants } from "@/components/ui/button"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { cn, getFileUrl } from "@/lib/utils"
-import { File } from "@prisma/client"
+import { PendingFile } from "@prisma/client"
 import { CheckIcon, Loader2Icon, SquareArrowOutUpRightIcon, XIcon } from "lucide-react"
 import Link from "next/link"
 import { useState } from "react"
 import { toast } from "sonner"
 
 interface PendingFilesTableProps {
-  pendingFiles: File[]
+  pendingFiles: PendingFile[]
 }
 
 export function PendingFilesTable({ pendingFiles }: PendingFilesTableProps) {
@@ -92,7 +92,12 @@ export function PendingFilesTable({ pendingFiles }: PendingFilesTableProps) {
               <TableCell>{file.semester}</TableCell>
               <TableCell>{file.section}</TableCell>
               <TableCell>{file.professorFullName}</TableCell>
-              <TableCell>{file.uploadedByEmail}</TableCell>
+              <TableCell>
+                <div className="flex items-center gap-2">
+                  {file.uploadedByEmail}
+                  {file.anonymous && <Badge variant="secondary">Anonyme</Badge>}
+                </div>
+              </TableCell>
               <TableCell className="text-right">
                 <div className="flex justify-end gap-2">
                   <Button

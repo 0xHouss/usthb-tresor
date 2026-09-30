@@ -15,6 +15,8 @@ export const UploadFormSchema = z.object({
   module: z.string(),
   professor: z.string(),
   type: z.string({ message: 'Please select an option.' }).min(1, 'Please select an option.').pipe(z.nativeEnum(FileType, { message: 'Please select a valid option.' })),
+  // Checkbox: FormData holds "on" when checked and nothing when unchecked.
+  anonymous: z.literal('on').nullish().transform(v => v === 'on'),
   file: z
     .instanceof(File)
     .refine(f => f.size, 'Please provide a file.')

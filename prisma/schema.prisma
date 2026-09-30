@@ -136,6 +136,9 @@ model PendingFile {
 
   status     FileStatus @default(Pending)
 
+  // Hides the uploader from public views; moderators and admins still see it.
+  anonymous Boolean @default(false)
+
   uploadedAt      DateTime @default(now())
 
   uploadedBy User @relation(fields: [uploadedByEmail], references: [email])
@@ -164,6 +167,9 @@ model File {
   professorFullName String
 
   uploadedAt DateTime   @default(now())
+
+  // Hides the uploader from public views; moderators and admins still see it.
+  anonymous Boolean @default(false)
 
   uploadedBy      User   @relation(fields: [uploadedByEmail], references: [email])
   uploadedByEmail String
