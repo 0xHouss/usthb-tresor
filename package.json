@@ -3,8 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack",
-    "build": "next build",
+    "postinstall": "prisma generate",
+    "dev": "prisma migrate deploy && prisma generate && next dev --turbopack",
+    "build": "prisma generate && pnpm db:deploy && next build",
+    "db:deploy": "if [ \"$VERCEL_ENV\" = preview ]; then echo 'Skipping migrations on preview deployment'; else prisma migrate deploy; fi",
     "start": "next start",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",

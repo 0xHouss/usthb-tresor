@@ -10,7 +10,10 @@ USTHB Trésor — a collaborative resource hub where USTHB students share and br
 
 Package manager is **pnpm**.
 
-- `pnpm dev` — dev server (Next.js + Turbopack)
+- `docker compose up -d` — local PostgreSQL on port **5435** (5433/5434 are used by other projects on this machine)
+- `pnpm dev` — applies pending migrations (`prisma migrate deploy`), regenerates the Prisma client, then starts the dev server (Next.js + Turbopack)
+- `pnpm build` — generates the client, runs `pnpm db:deploy`, then `next build`. `db:deploy` applies pending migrations but is a no-op on Vercel preview deployments (`VERCEL_ENV=preview`), so unmerged branches never migrate a shared database
+- Schema changes: author migrations with `pnpm prisma migrate dev --name <name>`; they are applied automatically everywhere else. Hand-edit the SQL when a change renames columns, so data isn't dropped
 - `pnpm lint` — ESLint
 - `pnpm typecheck` — `tsc --noEmit` (not part of lint; run it before assuming type-correctness)
 - `pnpm test` — Vitest unit tests, run once (`pnpm test:watch` for watch)
