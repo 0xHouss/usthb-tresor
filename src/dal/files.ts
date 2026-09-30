@@ -3,13 +3,34 @@ import "server-only";
 import { prisma } from "@/lib/prisma";
 import type { ParsedSearchParams } from "@/lib/search-params";
 import { getCurrentAcademicYear, PAGE_SIZE } from "@/lib/utils";
-import { Prisma } from "@prisma/client";
+import { File, Prisma } from "@prisma/client";
+import { cache } from "react";
 
-// Approved `File` reads. All public — anyone (including visitors) may browse.
+// Approved `File` reads. All public — anyone (including visitors) may browse,
+// so uploader emails are never returned.
+
+/** A published file as exposed publicly. */
+export type PublicFile = Omit<File, "uploadedByEmail">;
 
 export function getRecentFiles(take = 6) {
-  return prisma.file.findMany({ orderBy: { uploadedAt: "desc" }, take });
+  return prisma.file.findMany({ omit: { uploadedByEmail: true }, orderBy: { uploadedAt: "desc" }, take });
 }
+
+/**
+ * A published file with its uploader's public profile, or null if it doesn't exist.
+ * `uploader` is null for anonymous uploads.
+ */
+export const getFile = cache(async (id: string) => {
+  const file = await prisma.file.findUnique({
+    where: { id },
+    omit: { uploadedByEmail: true },
+    include: { uploadedBy: { select: { name: true, image: true } } },
+  });
+  if (!file) return null;
+
+  const { uploadedBy, ...publicFile } = file;
+  return { ...publicFile, uploader: file.anonymous ? null : uploadedBy };
+});
 
 export async function getFileStats() {
   const [resources, majors, modules, contributors] = await Promise.all([
@@ -67,6 +88,7 @@ export async function getFiles({
   const [files, totalCount] = await Promise.all([
     prisma.file.findMany({
       where,
+      omit: { uploadedByEmail: true },
       take: PAGE_SIZE,
       skip: (page - 1) * PAGE_SIZE,
     }),

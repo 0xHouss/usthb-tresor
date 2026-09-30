@@ -1,12 +1,12 @@
-import { fileTypeLabels, getFileDownloadUrl, getFileUrl } from "@/lib/utils";
+import type { PublicFile } from "@/dal/files";
+import { fileTypeLabels, getFileDownloadUrl } from "@/lib/utils";
 import { DownloadIcon } from "lucide-react";
 
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import Link from "next/link";
-import { File } from "@prisma/client";
 
 interface ResourceCardProps {
-  file: File;
+  file: PublicFile;
 }
 
 export default function ResourceCard({file}: ResourceCardProps) {
@@ -20,7 +20,7 @@ export default function ResourceCard({file}: ResourceCardProps) {
           <div className="space-y-1">
             <p className="text-muted-foreground text-xs font-normal">{file.academicYear}/{file.academicYear + 1}</p>
             <CardTitle className="truncate hover:underline text-lg/[1em]">
-              <Link href={getFileUrl(file.driveId)} target="_blank">
+              <Link href={`/files/${file.id}`}>
                 {fileTypeLabels[file.type]} - {file.moduleName}
               </Link>
             </CardTitle>

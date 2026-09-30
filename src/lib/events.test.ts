@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { describeEvent, fileEventMetadata } from "./events";
+import { commentEventMetadata, describeEvent, excerpt, fileEventMetadata } from "./events";
 
 describe("fileEventMetadata", () => {
   it("snapshots the file's identifying details", () => {
@@ -28,9 +28,40 @@ describe("describeEvent", () => {
     ).toBe("Exam · Algo · L1 · anonyme");
   });
 
+  it("quotes comment excerpts and flags moderator deletions", () => {
+    const file = { type: "Exam", moduleName: "Algo", academicLevel: "L1" } as const;
+    expect(describeEvent(commentEventMetadata(file, "Merci !"))).toBe("Exam · Algo · L1 · « Merci ! »");
+    expect(describeEvent(commentEventMetadata(file, "Spam", { moderated: true }))).toBe(
+      "Exam · Algo · L1 · « Spam » · par la modération"
+    );
+  });
+
   it("returns an empty string for missing or unknown metadata", () => {
     expect(describeEvent(null)).toBe("");
     expect(describeEvent({ foo: "bar" })).toBe("");
     expect(describeEvent("text")).toBe("");
+  });
+});
+
+describe("excerpt", () => {
+  it("keeps short text as-is, collapsed to one line", () => {
+    expect(excerpt("  Très\n utile   merci ")).toBe("Très utile merci");
+  });
+
+  it("truncates long text with an ellipsis", () => {
+    expect(excerpt("abcdefghij", 5)).toBe("abcd…");
+  });
+});
+
+describe("commentEventMetadata", () => {
+  it("never records the file's anonymous flag", () => {
+    const file = { type: "Exam", moduleName: "Algo", academicLevel: "L1", anonymous: true } as const;
+    expect(commentEventMetadata(file, "ok")).not.toHaveProperty("anonymous");
+  });
+
+  it("only records the moderated flag when set", () => {
+    const file = { type: "Exam", moduleName: "Algo", academicLevel: "L1" } as const;
+    expect(commentEventMetadata(file, "ok")).not.toHaveProperty("moderated");
+    expect(commentEventMetadata(file, "ok", { moderated: true })).toHaveProperty("moderated", true);
   });
 });

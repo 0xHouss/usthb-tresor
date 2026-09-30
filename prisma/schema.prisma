@@ -30,6 +30,7 @@ model User {
   File File[]
   PendingFile PendingFile[]
   events      EventLog[]
+  comments    Comment[]
 }
 
 model Account {
@@ -174,6 +175,8 @@ model File {
 
   uploadedBy      User   @relation(fields: [uploadedByEmail], references: [email])
   uploadedByEmail String
+
+  comments Comment[]
 }
 
 model Professor {
@@ -197,6 +200,24 @@ model Major {
   File File[]
 }
 
+// Comments
+
+model Comment {
+  id      String @id @default(cuid())
+  content String
+
+  file   File   @relation(fields: [fileId], references: [id], onDelete: Cascade)
+  fileId String
+
+  author   User   @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  authorId String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([fileId, createdAt])
+}
+
 // Audit log
 
 enum EventType {
@@ -204,6 +225,8 @@ enum EventType {
   FileSubmitted
   FileApproved
   FileRejected
+  CommentCreated
+  CommentDeleted
 }
 
 model EventLog {
