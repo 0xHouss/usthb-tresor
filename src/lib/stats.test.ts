@@ -61,14 +61,16 @@ describe("niceCeil", () => {
 
 describe("formatCompact", () => {
   it("keeps small numbers as-is and compacts large ones", () => {
-    expect(formatCompact(42)).toBe("42");
-    expect(formatCompact(1284).replace(/\s/g, " ")).toBe("1,3 k");
+    expect(formatCompact(42, "fr")).toBe("42");
+    expect(formatCompact(1284, "fr").replace(/\s/g, " ")).toBe("1,3 k");
+    expect(formatCompact(1284, "en")).toBe("1.3K");
   });
 });
 
 describe("formatDay", () => {
-  it("formats a day key as a short French date", () => {
-    expect(formatDay("2026-09-30")).toBe("30 sept.");
-    expect(formatDay("2026-01-01")).toBe("1 janv.");
+  it("formats a day key as a short date in the given locale", () => {
+    expect(formatDay("2026-09-30", "fr")).toBe("30 sept.");
+    expect(formatDay("2026-01-01", "fr")).toBe("1 janv.");
+    expect(formatDay("2026-09-30", "en")).toBe("Sep 30");
   });
 });

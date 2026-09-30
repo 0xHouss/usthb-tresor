@@ -1,11 +1,12 @@
 "use client";
 
+import { Link } from '@/i18n/navigation'
+import type { SessionUser } from '@/lib/auth';
 import { cn } from '@/lib/utils'
 import { Menu, X } from 'lucide-react'
-import Link from 'next/link'
-import { Button } from './ui/button'
+import { useTranslations } from 'next-intl'
 import { useState } from 'react';
-import type { SessionUser } from '@/lib/auth';
+import { Button } from './ui/button'
 
 interface MobileHeaderMenuProps {
   user: SessionUser | null;
@@ -14,6 +15,7 @@ interface MobileHeaderMenuProps {
 const linkClassName = "block px-3 py-2 text-base font-medium text-foreground hover:text-primary hover:bg-accent rounded-md transition-colors"
 
 export default function MobileHeaderMenu({ user }: MobileHeaderMenuProps) {
+  const t = useTranslations("nav")
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   const toggleMobileMenu = () => setMobileMenuOpen(prev => !prev)
@@ -22,13 +24,13 @@ export default function MobileHeaderMenu({ user }: MobileHeaderMenuProps) {
   const isStaff = user?.role === "Admin" || user?.role === "Moderator"
 
   const links = [
-    { href: "/browse", label: "Resources" },
-    { href: "/contribute", label: "Contribute" },
-    { href: "/contact", label: "Contact Us" },
+    { href: "/browse", label: t("resources") },
+    { href: "/contribute", label: t("contribute") },
+    { href: "/contact", label: t("contact") },
     ...(isStaff
       ? [
-          { href: "/submissions", label: "Submissions" },
-          { href: "/admin", label: "Administration" },
+          { href: "/submissions", label: t("submissions") },
+          { href: "/admin", label: t("administration") },
         ]
       : []),
   ]
@@ -41,7 +43,7 @@ export default function MobileHeaderMenu({ user }: MobileHeaderMenuProps) {
         size="icon"
         className="md:hidden"
         onClick={toggleMobileMenu}
-        aria-label="Toggle mobile menu"
+        aria-label={t("toggleMenu")}
       >
         {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
       </Button>

@@ -4,9 +4,11 @@ import { createComment, deleteComment as deleteCommentRecord, getComment } from 
 import { logEvent } from "@/dal/events"
 import { requireUser } from "@/dal/session"
 import { commentEventMetadata } from "@/lib/events"
+import { getErrorTranslator } from "@/lib/action-errors"
 import { FormState, fromErrorToFormState, toFormState } from "@/lib/form-state"
+import { revalidateLocalized } from "@/lib/revalidate"
 import { CommentFormSchema } from "@/lib/schemas/comment-schema"
-import { revalidatePath } from "next/cache"
+import { getTranslations } from "next-intl/server"
 
 export async function addComment(fileId: string, state: FormState, formData: FormData): Promise<FormState> {
   try {
@@ -22,11 +24,12 @@ export async function addComment(fileId: string, state: FormState, formData: For
       metadata: commentEventMetadata(comment.file, comment.content),
     })
 
-    revalidatePath(`/files/${fileId}`)
+    revalidateLocalized(`/files/${fileId}`)
 
-    return toFormState("SUCCESS", formData, { message: "Commentaire publié.", reset: true })
+    const t = await getTranslations("comments")
+    return toFormState("SUCCESS", formData, { message: t("published"), reset: true })
   } catch (error) {
-    return fromErrorToFormState(error, formData)
+    return fromErrorToFormState(error, formData, await getErrorTranslator())
   }
 }
 
@@ -50,5 +53,5 @@ export async function deleteComment(commentId: string) {
     metadata: commentEventMetadata(comment.file, comment.content, { moderated: !isAuthor }),
   })
 
-  revalidatePath(`/files/${comment.fileId}`)
+  revalidateLocalized(`/files/${comment.fileId}`)
 }

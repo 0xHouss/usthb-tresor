@@ -4,10 +4,12 @@ import { logEvent } from "@/dal/events"
 import { closeReport as closeReportRecord, createReport, deleteReportedFile } from "@/dal/reports"
 import { requireAdmin, requireModerator, requireUser } from "@/dal/session"
 import { fileEventMetadata, reportEventMetadata, type FileEventMetadata } from "@/lib/events"
+import { getErrorTranslator } from "@/lib/action-errors"
 import { FormState, fromErrorToFormState, toFormState } from "@/lib/form-state"
 import { deleteDriveFile } from "@/lib/google-drive"
+import { revalidateLocalized } from "@/lib/revalidate"
 import { ReportFormSchema } from "@/lib/schemas/report-schema"
-import { revalidatePath } from "next/cache"
+import { getTranslations } from "next-intl/server"
 
 export async function reportFile(fileId: string, state: FormState, formData: FormData): Promise<FormState> {
   try {
@@ -26,14 +28,12 @@ export async function reportFile(fileId: string, state: FormState, formData: For
       metadata: reportEventMetadata(report.fileMetadata as FileEventMetadata, reason),
     })
 
-    revalidatePath("/admin/reports")
+    revalidateLocalized("/admin/reports")
 
-    return toFormState("SUCCESS", formData, {
-      message: "Merci ! Votre signalement a été transmis à la modération.",
-      reset: true,
-    })
+    const t = await getTranslations("report")
+    return toFormState("SUCCESS", formData, { message: t("sent"), reset: true })
   } catch (error) {
-    return fromErrorToFormState(error, formData)
+    return fromErrorToFormState(error, formData, await getErrorTranslator())
   }
 }
 
@@ -51,7 +51,7 @@ export async function closeReport(reportId: string, status: "Resolved" | "Dismis
     metadata: reportEventMetadata(report.fileMetadata as FileEventMetadata, report.reason),
   })
 
-  revalidatePath("/admin/reports")
+  revalidateLocalized("/admin/reports")
 }
 
 /**
@@ -78,8 +78,8 @@ export async function deleteFile(fileId: string) {
     console.error(`Failed to delete Drive file ${file.driveId}:`, error)
   }
 
-  revalidatePath("/admin/reports")
-  revalidatePath(`/files/${file.id}`)
-  revalidatePath("/browse")
-  revalidatePath("/")
+  revalidateLocalized("/admin/reports")
+  revalidateLocalized(`/files/${file.id}`)
+  revalidateLocalized("/browse")
+  revalidateLocalized("/")
 }

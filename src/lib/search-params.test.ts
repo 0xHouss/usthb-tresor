@@ -52,6 +52,11 @@ describe("parseSearchParams", () => {
     ]);
   });
 
+  it("keeps only valid Language values", async () => {
+    expect((await parse({ languages: "French,Arabic,English" })).languages).toEqual(["French", "English"]);
+    expect((await parse({})).languages).toBeUndefined();
+  });
+
   it("keeps a valid semester and drops an invalid one", async () => {
     expect((await parse({ semester: "S1" })).semester).toBe("S1");
     expect((await parse({ semester: "S9" })).semester).toBeUndefined();

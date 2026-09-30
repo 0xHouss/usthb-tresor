@@ -1,6 +1,7 @@
 import "server-only";
 
 import { requireModerator } from "@/dal/session";
+import { AppError } from "@/lib/errors";
 import { fileEventMetadata } from "@/lib/events";
 import { prisma } from "@/lib/prisma";
 import { Prisma, ReportReason, ReportStatus } from "@prisma/client";
@@ -18,13 +19,13 @@ export async function createReport(data: {
   details?: string;
 }) {
   const file = await prisma.file.findUnique({ where: { id: data.fileId } });
-  if (!file) throw new Error("Ce fichier n'existe plus.");
+  if (!file) throw new AppError("fileGone");
 
   const existing = await prisma.report.findFirst({
     where: { fileId: data.fileId, reporterId: data.reporterId, status: ReportStatus.Open },
     select: { id: true },
   });
-  if (existing) throw new Error("Vous avez déjà signalé ce fichier. Votre signalement est en cours de traitement.");
+  if (existing) throw new AppError("alreadyReported");
 
   return prisma.report.create({
     data: { ...data, fileMetadata: fileEventMetadata({ ...file, anonymous: false }) },

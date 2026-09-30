@@ -1,5 +1,5 @@
 import { isEnumValue } from "@/lib/utils";
-import { AcademicLevel, FileType, Semester } from "@prisma/client";
+import { AcademicLevel, FileType, Language, Semester } from "@prisma/client";
 
 export type SearchParams = Promise<{
   semester?: string;
@@ -12,6 +12,7 @@ export type SearchParams = Promise<{
   professors?: string;
   types?: string;
   modules?: string;
+  languages?: string;
   page?: string
 } & URLSearchParams>
 
@@ -25,7 +26,7 @@ const toInt = (value: string | undefined) => {
 export const parsePage = (value: string | undefined) => Math.max(1, toInt(value) ?? 1);
 
 export async function parseSearchParams(params: SearchParams) {
-  const { academicLevels, semester, majors, section, group, startYear, endYear, professors, modules, types, page } = await params;
+  const { academicLevels, semester, majors, section, group, startYear, endYear, professors, modules, types, languages, page } = await params;
 
   const parsedParams = {
     semester: isEnumValue(Semester, semester) ? semester : undefined,
@@ -38,6 +39,7 @@ export async function parseSearchParams(params: SearchParams) {
     professors: professors?.length ? professors.split(",") : undefined,
     types: types?.length ? types.split(",").filter(t => isEnumValue(FileType, t)) : undefined,
     modules: modules?.length ? modules.split(",") : undefined,
+    languages: languages?.length ? languages.split(",").filter(l => isEnumValue(Language, l)) : undefined,
     page: parsePage(page),
   };
 

@@ -1,5 +1,22 @@
 import { describe, expect, it } from "vitest";
-import { commentEventMetadata, describeEvent, describeFile, excerpt, fileEventMetadata, reportEventMetadata } from "./events";
+import fr from "../../messages/fr.json";
+import {
+  commentEventMetadata,
+  type DescribeLabels,
+  describeEvent,
+  describeFile,
+  excerpt,
+  fileEventMetadata,
+  reportEventMetadata,
+} from "./events";
+
+// The French catalogue's labels, as the log viewer passes them.
+const labels: DescribeLabels = {
+  fileType: type => fr.enums.fileTypes[type],
+  reason: reason => fr.enums.reportReasons[reason],
+  anonymous: fr.events.anonymous,
+  moderated: fr.events.moderated,
+};
 
 describe("fileEventMetadata", () => {
   it("snapshots the file's identifying details", () => {
@@ -17,34 +34,34 @@ describe("fileEventMetadata", () => {
 
 describe("describeEvent", () => {
   it("describes file metadata", () => {
-    expect(describeEvent({ fileType: "DW_Worksheet", module: "Analyse", academicLevel: "L2" })).toBe(
-      "DW Worksheet · Analyse · L2"
+    expect(describeEvent({ fileType: "DW_Worksheet", module: "Analyse", academicLevel: "L2" }, labels)).toBe(
+      "TD · Analyse · L2"
     );
   });
 
   it("flags anonymous submissions", () => {
     expect(
-      describeEvent({ fileType: "Exam", module: "Algo", academicLevel: "L1", anonymous: true })
-    ).toBe("Exam · Algo · L1 · anonyme");
+      describeEvent({ fileType: "Exam", module: "Algo", academicLevel: "L1", anonymous: true }, labels)
+    ).toBe("Examen · Algo · L1 · anonyme");
   });
 
   it("quotes comment excerpts and flags moderator deletions", () => {
     const file = { type: "Exam", moduleName: "Algo", academicLevel: "L1" } as const;
-    expect(describeEvent(commentEventMetadata(file, "Merci !"))).toBe("Exam · Algo · L1 · « Merci ! »");
-    expect(describeEvent(commentEventMetadata(file, "Spam", { moderated: true }))).toBe(
-      "Exam · Algo · L1 · « Spam » · par la modération"
+    expect(describeEvent(commentEventMetadata(file, "Merci !"), labels)).toBe("Examen · Algo · L1 · « Merci ! »");
+    expect(describeEvent(commentEventMetadata(file, "Spam", { moderated: true }), labels)).toBe(
+      "Examen · Algo · L1 · « Spam » · par la modération"
     );
   });
 
   it("labels report reasons", () => {
     const file = { fileType: "Exam", module: "Algo", academicLevel: "L1" } as const;
-    expect(describeEvent(reportEventMetadata(file, "Copyright"))).toBe("Exam · Algo · L1 · Droits d'auteur");
+    expect(describeEvent(reportEventMetadata(file, "Copyright"), labels)).toBe("Examen · Algo · L1 · Droits d'auteur");
   });
 
   it("returns an empty string for missing or unknown metadata", () => {
-    expect(describeEvent(null)).toBe("");
-    expect(describeEvent({ foo: "bar" })).toBe("");
-    expect(describeEvent("text")).toBe("");
+    expect(describeEvent(null, labels)).toBe("");
+    expect(describeEvent({ foo: "bar" }, labels)).toBe("");
+    expect(describeEvent("text", labels)).toBe("");
   });
 });
 
@@ -74,11 +91,11 @@ describe("commentEventMetadata", () => {
 describe("describeFile", () => {
   it("describes the file without event-specific details", () => {
     expect(
-      describeFile({ fileType: "Exam", module: "Algo", academicLevel: "L1", anonymous: true, reason: "Other" })
-    ).toBe("Exam · Algo · L1");
+      describeFile({ fileType: "Exam", module: "Algo", academicLevel: "L1", anonymous: true, reason: "Other" }, labels)
+    ).toBe("Examen · Algo · L1");
   });
 
   it("returns an empty string for unknown metadata", () => {
-    expect(describeFile(null)).toBe("");
+    expect(describeFile(null, labels)).toBe("");
   });
 });

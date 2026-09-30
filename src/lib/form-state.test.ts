@@ -1,30 +1,32 @@
 import { describe, expect, it } from "vitest";
 import { z } from "zod";
+import { AppError } from "./errors";
 import { fromErrorToFormState, getPrevValue, toFormState } from "./form-state";
 
 describe("fromErrorToFormState", () => {
-  it("maps a ZodError to fieldErrors", () => {
-    const schema = z.object({ name: z.string().min(1, "Required") });
+  const translate = (key: string) => `t:${key}`;
+
+  it("maps a ZodError to translated fieldErrors", () => {
+    const schema = z.object({ name: z.string().min(1, "required") });
     const result = schema.safeParse({ name: "" });
     expect(result.success).toBe(false);
 
-    const state = fromErrorToFormState(result.error, new FormData());
+    const state = fromErrorToFormState(result.error, new FormData(), translate);
     expect(state.status).toBe("ERROR");
-    expect(state.fieldErrors.name).toEqual(["Required"]);
+    expect(state.fieldErrors.name).toEqual(["t:required"]);
     expect(state.message).toBe("");
   });
 
-  it("maps a generic Error to its message", () => {
-    const state = fromErrorToFormState(new Error("boom"), new FormData());
+  it("maps an AppError to its translated message", () => {
+    const state = fromErrorToFormState(new AppError("fileGone"), new FormData(), translate);
     expect(state.status).toBe("ERROR");
-    expect(state.message).toBe("boom");
+    expect(state.message).toBe("t:fileGone");
     expect(state.fieldErrors).toEqual({});
   });
 
-  it("falls back to a generic message for non-Error values", () => {
-    const state = fromErrorToFormState("just a string", new FormData());
-    expect(state.status).toBe("ERROR");
-    expect(state.message).toBe("An error occured !");
+  it("hides other errors behind a generic message", () => {
+    expect(fromErrorToFormState(new Error("db exploded"), new FormData(), translate).message).toBe("t:unexpected");
+    expect(fromErrorToFormState("just a string", new FormData(), translate).message).toBe("t:unexpected");
   });
 });
 

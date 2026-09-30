@@ -1,4 +1,3 @@
-import { FileType } from "@prisma/client";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 
@@ -22,15 +21,6 @@ export const getFileUrl = (driveId: string) => `https://drive.google.com/file/d/
 export const getFileDownloadUrl = (driveId: string) =>
   `https://drive.usercontent.google.com/download?id=${driveId}&export=download&confirm=t`
 
-export const fileTypeLabels: { [key in FileType]: string } = {
-  [FileType.Lecture]: "Lecture",
-  [FileType.DW_Worksheet]: "DW Worksheet",
-  [FileType.PW_Worksheet]: "PW Worksheet",
-  [FileType.Interrogation]: "Interrogation",
-  [FileType.Exam]: "Exam",
-  [FileType.PW_Exam]: "PW Exam",
-};
-
 export function getCurrentAcademicYear() {
   const now = new Date()
 
@@ -38,14 +28,9 @@ export function getCurrentAcademicYear() {
   return now.getMonth() < 7 ? now.getFullYear() - 1 : now.getFullYear();
 }
 
-const dateTimeFormat = new Intl.DateTimeFormat("fr-FR", {
-  dateStyle: "short",
-  timeStyle: "short",
-  timeZone: "Africa/Algiers",
-});
-
 // Pinned to Algiers time so server-rendered dates don't depend on the host's timezone.
-export const formatDateTime = (date: Date) => dateTimeFormat.format(date);
+export const formatDateTime = (date: Date, locale: string) =>
+  new Intl.DateTimeFormat(locale, { dateStyle: "short", timeStyle: "short", timeZone: "Africa/Algiers" }).format(date);
 
 export const PAGE_SIZE = 24;
 

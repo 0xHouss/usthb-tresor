@@ -1,7 +1,7 @@
 "use client"
 
 import type { AcademicYearRange } from "@/dal/files"
-import { ParsedSearchParams } from "@/app/(home)/browse/page"
+import type { ParsedSearchParams } from "@/lib/search-params"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -12,34 +12,14 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { cn } from "@/lib/utils"
-import { Major, Module, Professor } from "@prisma/client"
+import { AcademicLevel, FileType, Language, Major, Module, Professor, Semester } from "@prisma/client"
 import { Check, ChevronsUpDown, Filter, X } from "lucide-react"
+import { useTranslations } from "next-intl"
 import { useState } from "react"
 
-const academicLevels = [
-  "L1",
-  "L2",
-  "L3",
-  "M1",
-  "M2",
-  "D1",
-  "D2",
-  "D3",
-  "ING 1",
-  "ING 2",
-  "ING 3",
-  "ING 4",
-  "ING 5",
-]
-
-const fileTypes = [
-  { label: "Lecture", value: "Lecture" },
-  { label: "DW Worksheet", value: "DW_Worksheet" },
-  { label: "PW Worksheet", value: "PW_Worksheet" },
-  { label: "Interrogation", value: "Interrogation" },
-  { label: "Exam", value: "Exam" },
-  { label: "PW Exam", value: "PW_Exam" },
-]
+const academicLevels = Object.values(AcademicLevel)
+const fileTypes = Object.values(FileType)
+const languages = Object.values(Language)
 
 interface SelectedItemBadgeProps {
   label: string
@@ -68,6 +48,8 @@ interface FileFilterSidebarProps {
 }
 
 export function FileFilterSidebar({ searchParams, majors, modules, professors, academicYearRange: { minYear, maxYear } }: FileFilterSidebarProps) {
+  const t = useTranslations("filters")
+  const tEnums = useTranslations("enums")
   const [open, setOpen] = useState(false)
   const [selectedMajors, setSelectedMajors] = useState<string[]>(searchParams.majors ?? [])
   const [selectedLevels, setSelectedLevels] = useState<string[]>(searchParams.academicLevels ?? [])
@@ -79,6 +61,7 @@ export function FileFilterSidebar({ searchParams, majors, modules, professors, a
   const [selectedModules, setSelectedModules] = useState<string[]>(searchParams.modules ?? [])
   const [selectedProfessors, setSelectedProfessors] = useState<string[]>(searchParams.professors ?? [])
   const [selectedTypes, setSelectedTypes] = useState<string[]>(searchParams.types ?? [])
+  const [selectedLanguages, setSelectedLanguages] = useState<string[]>(searchParams.languages ?? [])
   const [filtersVisible, setFiltersVisible] = useState(true)
 
   const yearRange = Array.from({ length: maxYear - minYear + 1 }, (_, i) => maxYear - i)
@@ -89,6 +72,7 @@ export function FileFilterSidebar({ searchParams, majors, modules, professors, a
     ...selectedModules,
     ...selectedProfessors,
     ...selectedTypes,
+    ...selectedLanguages,
   ]
 
   if (section) totalActiveFilters.push(section)
@@ -108,6 +92,7 @@ export function FileFilterSidebar({ searchParams, majors, modules, professors, a
     setSelectedModules([])
     setSelectedProfessors([])
     setSelectedTypes([])
+    setSelectedLanguages([])
   }
 
   const toggleFilter = (
@@ -137,6 +122,7 @@ export function FileFilterSidebar({ searchParams, majors, modules, professors, a
     if (selectedProfessors.length) params.set("professors", selectedProfessors.join(","));
     if (selectedTypes.length) params.set("types", selectedTypes.join(","));
     if (selectedModules.length) params.set("modules", selectedModules.join(","));
+    if (selectedLanguages.length) params.set("languages", selectedLanguages.join(","));
 
     window.location.search = params.toString();
   }
@@ -146,20 +132,21 @@ export function FileFilterSidebar({ searchParams, majors, modules, professors, a
       <div className="flex items-center justify-between p-4 border-b">
         <div className="flex items-center gap-2">
           <Filter className="h-5 w-5" />
-          <h3 className="font-medium">Filters</h3>
+          <h3 className="font-medium">{t("title")}</h3>
           <Badge variant="secondary" className="ml-1">
             {totalActiveFiltersNumber}
           </Badge>
         </div>
         <div className="flex items-center gap-2">
           <Button variant="ghost" size="sm" onClick={clearAllFilters} className="px-2 h-0 text-xs cursor-pointer">
-            Clear all
+            {t("clearAll")}
           </Button>
           <Button
             variant="ghost"
             size="icon"
             className="h-8 w-8 md:hidden"
             onClick={() => setFiltersVisible(!filtersVisible)}
+            aria-label={t("toggle")}
           >
             {filtersVisible ? <X className="h-4 w-4" /> : <Filter className="h-4 w-4" />}
           </Button>
@@ -167,23 +154,23 @@ export function FileFilterSidebar({ searchParams, majors, modules, professors, a
       </div>
 
       <ScrollArea className={cn("flex-1 p-4 overflow-hidden", !filtersVisible && "hidden md:block")}>
-        <Accordion type="multiple" defaultValue={["major", "level", "year", "type"]}>
+        <Accordion type="multiple" defaultValue={["major", "level", "year", "type", "language"]}>
           <AccordionItem value="major">
-            <AccordionTrigger className="text-sm font-medium">Major</AccordionTrigger>
+            <AccordionTrigger className="text-sm font-medium">{t("major")}</AccordionTrigger>
             <AccordionContent>
               <div className="space-y-2">
                 <Popover open={open} onOpenChange={setOpen}>
                   <PopoverTrigger asChild>
                     <Button variant="outline" role="combobox" aria-expanded={open} className="w-full justify-between">
-                      {selectedMajors.length > 0 ? `${selectedMajors.length} selected` : "Select major..."}
+                      {selectedMajors.length > 0 ? t("selected", { count: selectedMajors.length }) : t("selectMajor")}
                       <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-full p-0">
                     <Command>
-                      <CommandInput placeholder="Search major..." />
+                      <CommandInput placeholder={t("searchMajor")} />
                       <CommandList>
-                        <CommandEmpty>No major found.</CommandEmpty>
+                        <CommandEmpty>{t("noMajor")}</CommandEmpty>
                         <CommandGroup>
                           {majors.map(major => (
                             <CommandItem
@@ -226,21 +213,21 @@ export function FileFilterSidebar({ searchParams, majors, modules, professors, a
           </AccordionItem>
 
           <AccordionItem value="level">
-            <AccordionTrigger className="text-sm font-medium">Academic Level</AccordionTrigger>
+            <AccordionTrigger className="text-sm font-medium">{t("level")}</AccordionTrigger>
             <AccordionContent>
               <div className="space-y-2">
                 <Popover>
                   <PopoverTrigger asChild>
                     <Button variant="outline" role="combobox" className="w-full justify-between">
-                      {selectedLevels.length > 0 ? `${selectedLevels.length} selected` : "Select levels..."}
+                      {selectedLevels.length > 0 ? t("selected", { count: selectedLevels.length }) : t("selectLevels")}
                       <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-full p-0" side="bottom">
                     <Command>
-                      <CommandInput placeholder="Search levels..." />
+                      <CommandInput placeholder={t("searchLevels")} />
                       <CommandList>
-                        <CommandEmpty>No level found.</CommandEmpty>
+                        <CommandEmpty>{t("noLevel")}</CommandEmpty>
                         <CommandGroup>
                           {academicLevels.map((level) => (
                             <CommandItem
@@ -280,23 +267,23 @@ export function FileFilterSidebar({ searchParams, majors, modules, professors, a
           </AccordionItem>
 
           <AccordionItem value="section">
-            <AccordionTrigger className="text-sm font-medium">Section & Group</AccordionTrigger>
+            <AccordionTrigger className="text-sm font-medium">{t("sectionGroup")}</AccordionTrigger>
             <AccordionContent>
               <div className="flex gap-2">
                 <div className="space-y-2">
-                  <Label htmlFor="section">Section</Label>
+                  <Label htmlFor="section">{t("section")}</Label>
                   <Input
                     id="section"
-                    placeholder="Enter section..."
+                    placeholder={t("sectionPlaceholder")}
                     value={section}
                     onChange={e => setSection(e.target.value)}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="group">Group</Label>
+                  <Label htmlFor="group">{t("group")}</Label>
                   <Input
                     id="group"
-                    placeholder="Enter group..."
+                    placeholder={t("groupPlaceholder")}
                     value={group}
                     onChange={e => setGroup(e.target.value)}
                   />
@@ -306,12 +293,12 @@ export function FileFilterSidebar({ searchParams, majors, modules, professors, a
           </AccordionItem>
 
           <AccordionItem value="year">
-            <AccordionTrigger className="text-sm font-medium">Academic Year</AccordionTrigger>
+            <AccordionTrigger className="text-sm font-medium">{t("year")}</AccordionTrigger>
             <AccordionContent>
               <div className="flex justify-between items-center gap-4">
                 <Select value={startYear.toString()} onValueChange={(value) => setStartYear(Number(value))}>
-                  <SelectTrigger id="year-start" className="flex-1">
-                    <SelectValue placeholder="Select start year" />
+                  <SelectTrigger id="year-start" className="flex-1" aria-label={t("startYear")}>
+                    <SelectValue placeholder={t("startYear")} />
                   </SelectTrigger>
                   <SelectContent>
                     {yearRange.map((year) => (
@@ -321,10 +308,10 @@ export function FileFilterSidebar({ searchParams, majors, modules, professors, a
                     ))}
                   </SelectContent>
                 </Select>
-                <span className="text-sm">to</span>
+                <span className="text-sm">{t("yearTo")}</span>
                 <Select value={endYear.toString()} onValueChange={(value) => setEndYear(Number(value))}>
-                  <SelectTrigger id="year-end" className="flex-1">
-                    <SelectValue placeholder="Select end year" />
+                  <SelectTrigger id="year-end" className="flex-1" aria-label={t("endYear")}>
+                    <SelectValue placeholder={t("endYear")} />
                   </SelectTrigger>
                   <SelectContent>
                     {yearRange.map((year) => (
@@ -339,43 +326,40 @@ export function FileFilterSidebar({ searchParams, majors, modules, professors, a
           </AccordionItem>
 
           <AccordionItem value="semester">
-            <AccordionTrigger className="text-sm font-medium">Semester</AccordionTrigger>
+            <AccordionTrigger className="text-sm font-medium">{t("semester")}</AccordionTrigger>
             <AccordionContent>
               <div className="flex gap-2">
-                <Button
-                  variant={semester === "1" ? "default" : "outline"}
-                  className="flex-1"
-                  onClick={() => setSemester(semester === "1" ? null : "1")}
-                >
-                  Semester 1
-                </Button>
-                <Button
-                  variant={semester === "2" ? "default" : "outline"}
-                  className="flex-1"
-                  onClick={() => setSemester(semester === "2" ? null : "2")}
-                >
-                  Semester 2
-                </Button>
+                {Object.values(Semester).map(value => (
+                  <Button
+                    key={value}
+                    type="button"
+                    variant={semester === value ? "default" : "outline"}
+                    className="flex-1"
+                    onClick={() => setSemester(semester === value ? null : value)}
+                  >
+                    {tEnums(`semesters.${value}`)}
+                  </Button>
+                ))}
               </div>
             </AccordionContent>
           </AccordionItem>
 
           <AccordionItem value="module">
-            <AccordionTrigger className="text-sm font-medium">Module</AccordionTrigger>
+            <AccordionTrigger className="text-sm font-medium">{t("module")}</AccordionTrigger>
             <AccordionContent>
               <div className="space-y-2">
                 <Popover>
                   <PopoverTrigger asChild>
                     <Button variant="outline" role="combobox" className="w-full justify-between">
-                      {selectedModules.length > 0 ? `${selectedModules.length} selected` : "Select modules..."}
+                      {selectedModules.length > 0 ? t("selected", { count: selectedModules.length }) : t("selectModules")}
                       <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-full p-0">
                     <Command>
-                      <CommandInput placeholder="Search modules..." />
+                      <CommandInput placeholder={t("searchModules")} />
                       <CommandList>
-                        <CommandEmpty>No module found.</CommandEmpty>
+                        <CommandEmpty>{t("noModule")}</CommandEmpty>
                         <CommandGroup>
                           {modules.map(module => (
                             <CommandItem
@@ -415,21 +399,21 @@ export function FileFilterSidebar({ searchParams, majors, modules, professors, a
           </AccordionItem>
 
           <AccordionItem value="professor">
-            <AccordionTrigger className="text-sm font-medium">Professor</AccordionTrigger>
+            <AccordionTrigger className="text-sm font-medium">{t("professor")}</AccordionTrigger>
             <AccordionContent>
               <div className="space-y-2">
                 <Popover>
                   <PopoverTrigger asChild>
                     <Button variant="outline" role="combobox" className="w-full justify-between">
-                      {selectedProfessors.length > 0 ? `${selectedProfessors.length} selected` : "Select professors..."}
+                      {selectedProfessors.length > 0 ? t("selected", { count: selectedProfessors.length }) : t("selectProfessors")}
                       <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-full p-0">
                     <Command>
-                      <CommandInput placeholder="Search professors..." />
+                      <CommandInput placeholder={t("searchProfessors")} />
                       <CommandList>
-                        <CommandEmpty>No professor found.</CommandEmpty>
+                        <CommandEmpty>{t("noProfessor")}</CommandEmpty>
                         <CommandGroup>
                           {professors.map(professor => (
                             <CommandItem
@@ -472,17 +456,35 @@ export function FileFilterSidebar({ searchParams, majors, modules, professors, a
           </AccordionItem>
 
           <AccordionItem value="type">
-            <AccordionTrigger className="text-sm font-medium">File Type</AccordionTrigger>
+            <AccordionTrigger className="text-sm font-medium">{t("type")}</AccordionTrigger>
             <AccordionContent>
               <div className="flex flex-wrap gap-2">
                 {fileTypes.map(type => (
                   <Badge
-                    key={type.value}
-                    variant={selectedTypes.includes(type.value) ? "default" : "outline"}
+                    key={type}
+                    variant={selectedTypes.includes(type) ? "default" : "outline"}
                     className="cursor-pointer"
-                    onClick={() => toggleFilter(type.value, selectedTypes, setSelectedTypes)}
+                    onClick={() => toggleFilter(type, selectedTypes, setSelectedTypes)}
                   >
-                    {type.label}
+                    {tEnums(`fileTypes.${type}`)}
+                  </Badge>
+                ))}
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+
+          <AccordionItem value="language">
+            <AccordionTrigger className="text-sm font-medium">{t("language")}</AccordionTrigger>
+            <AccordionContent>
+              <div className="flex flex-wrap gap-2">
+                {languages.map(language => (
+                  <Badge
+                    key={language}
+                    variant={selectedLanguages.includes(language) ? "default" : "outline"}
+                    className="cursor-pointer"
+                    onClick={() => toggleFilter(language, selectedLanguages, setSelectedLanguages)}
+                  >
+                    {tEnums(`languages.${language}`)}
                   </Badge>
                 ))}
               </div>
@@ -492,7 +494,7 @@ export function FileFilterSidebar({ searchParams, majors, modules, professors, a
       </ScrollArea>
 
       <form className={cn("p-4 border-t", !filtersVisible && "hidden md:block")} onSubmit={handleSubmit}>
-        <Button className="w-full cursor-pointer">Apply Filters</Button>
+        <Button className="w-full cursor-pointer">{t("apply")}</Button>
       </form>
     </div>
   )

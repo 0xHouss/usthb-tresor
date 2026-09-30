@@ -123,6 +123,12 @@ enum Semester {
   S2
 }
 
+// Language a document is written in (independent of the UI language).
+enum Language {
+  French
+  English
+}
+
 model PendingFile {
   id      String @id @default(cuid())
   driveId String @unique
@@ -140,6 +146,8 @@ model PendingFile {
   professorFullName String
 
   status     FileStatus @default(Pending)
+
+  language Language @default(French)
 
   // Hides the uploader from public views; moderators and admins still see it.
   anonymous Boolean @default(false)
@@ -172,6 +180,8 @@ model File {
   professorFullName String
 
   uploadedAt DateTime   @default(now())
+
+  language Language @default(French)
 
   // Hides the uploader from public views; moderators and admins still see it.
   anonymous Boolean @default(false)

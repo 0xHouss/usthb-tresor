@@ -2,7 +2,7 @@ import "server-only";
 
 import { prisma } from "@/lib/prisma";
 import { requireModerator } from "@/dal/session";
-import { AcademicLevel, FileStatus, FileType, Semester } from "@prisma/client";
+import { AcademicLevel, FileStatus, FileType, Language, Semester } from "@prisma/client";
 
 export type NewPendingFile = {
   driveId: string;
@@ -16,6 +16,7 @@ export type NewPendingFile = {
   majorName: string;
   moduleName: string;
   professorFullName: string;
+  language: Language;
   anonymous: boolean;
 };
 
@@ -38,6 +39,7 @@ export function createPendingFile(data: NewPendingFile) {
       majorName: data.majorName,
       moduleName: data.moduleName,
       professorFullName: data.professorFullName,
+      language: data.language,
       anonymous: data.anonymous,
       uploadedBy: { connect: { email: data.uploaderEmail } },
     },
@@ -82,6 +84,7 @@ export async function approvePendingFile(id: string) {
             create: { fullName: pendingFile.professorFullName },
           },
         },
+        language: pendingFile.language,
         anonymous: pendingFile.anonymous,
         uploadedBy: { connect: { email: pendingFile.uploadedByEmail } },
       },

@@ -1,8 +1,7 @@
 "use client";
 
+import { Link, usePathname } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
 
 export function NavLink({ href, label }: { href: string; label: string }) {
   const pathname = usePathname();

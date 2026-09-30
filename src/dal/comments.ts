@@ -1,5 +1,6 @@
 import "server-only";
 
+import { AppError } from "@/lib/errors";
 import { prisma } from "@/lib/prisma";
 
 // Comments on published files. Reads are public; callers authorize writes.
@@ -26,7 +27,7 @@ export type FileComment = Awaited<ReturnType<typeof getComments>>[number];
 /** Creates a comment. Returns it with a snapshot of the commented file. */
 export async function createComment(data: { fileId: string; authorId: string; content: string }) {
   const file = await prisma.file.findUnique({ where: { id: data.fileId }, select: { id: true } });
-  if (!file) throw new Error("Ce fichier n'existe plus.");
+  if (!file) throw new AppError("fileGone");
 
   return prisma.comment.create({ data, include: { file: fileSnapshot } });
 }

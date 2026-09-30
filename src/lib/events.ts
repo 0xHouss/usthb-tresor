@@ -1,21 +1,14 @@
-import { EventType, FileType, ReportReason } from "@prisma/client";
-import { reportReasonLabels } from "./reports";
-import { fileTypeLabels } from "./utils";
+import { FileType, ReportReason } from "@prisma/client";
 
 // Pure helpers for audit-log entries, shared by the writers (actions, auth hooks)
 // and the admin log viewer.
 
-export const eventTypeLabels: { [key in EventType]: string } = {
-  [EventType.UserLogin]: "Connexion",
-  [EventType.FileSubmitted]: "Fichier soumis",
-  [EventType.FileApproved]: "Fichier approuvé",
-  [EventType.FileRejected]: "Fichier rejeté",
-  [EventType.CommentCreated]: "Commentaire publié",
-  [EventType.CommentDeleted]: "Commentaire supprimé",
-  [EventType.ReportCreated]: "Signalement",
-  [EventType.ReportResolved]: "Signalement résolu",
-  [EventType.ReportDismissed]: "Signalement rejeté",
-  [EventType.FileDeleted]: "Fichier supprimé",
+/** Translated labels used to describe log entries in the viewer's locale. */
+export type DescribeLabels = {
+  fileType: (type: FileType) => string;
+  reason: (reason: ReportReason) => string;
+  anonymous: string;
+  moderated: string;
 };
 
 /** Snapshot of a file's identifying details, stored in an event's metadata. */
@@ -82,28 +75,28 @@ export function isFileEventMetadata(value: unknown): value is FileEventMetadata 
   return typeof v.fileType === "string" && typeof v.module === "string";
 }
 
+const isOneOf = <T extends string>(values: Record<string, T>, value: unknown): value is T =>
+  Object.values(values).includes(value as T);
+
 /** One-line description of a file snapshot, e.g. "Exam · Algo · L1". */
-export function describeFile(metadata: unknown): string {
+export function describeFile(metadata: unknown, labels: Pick<DescribeLabels, "fileType">): string {
   if (!isFileEventMetadata(metadata)) return "";
 
-  return [fileTypeLabels[metadata.fileType] ?? metadata.fileType, metadata.module, metadata.academicLevel]
-    .filter(Boolean)
-    .join(" · ");
+  const fileType = isOneOf(FileType, metadata.fileType) ? labels.fileType(metadata.fileType) : metadata.fileType;
+  return [fileType, metadata.module, metadata.academicLevel].filter(Boolean).join(" · ");
 }
 
 /** One-line human description of an event's target, or "" when there is nothing to show. */
-export function describeEvent(metadata: unknown): string {
+export function describeEvent(metadata: unknown, labels: DescribeLabels): string {
   if (!isFileEventMetadata(metadata)) return "";
 
-  const parts = [describeFile(metadata)];
-  if (metadata.anonymous) parts.push("anonyme");
+  const parts = [describeFile(metadata, labels)];
+  if (metadata.anonymous) parts.push(labels.anonymous);
 
   const v = metadata as Record<string, unknown>;
-  if (typeof v.reason === "string" && v.reason in reportReasonLabels) {
-    parts.push(reportReasonLabels[v.reason as ReportReason]);
-  }
+  if (isOneOf(ReportReason, v.reason)) parts.push(labels.reason(v.reason));
   if (typeof v.excerpt === "string") parts.push(`« ${v.excerpt} »`);
-  if (v.moderated === true) parts.push("par la modération");
+  if (v.moderated === true) parts.push(labels.moderated);
 
   return parts.filter(Boolean).join(" · ");
 }

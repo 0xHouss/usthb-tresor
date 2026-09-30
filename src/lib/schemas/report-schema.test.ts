@@ -24,7 +24,7 @@ describe("ReportFormSchema", () => {
   it("requires details for the Other reason", () => {
     const result = ReportFormSchema.safeParse({ reason: "Other", details: "   " });
     expect(result.success).toBe(false);
-    expect(result.error?.flatten().fieldErrors.details).toEqual(["Veuillez décrire le problème."]);
+    expect(result.error?.flatten().fieldErrors.details).toEqual(["detailsRequired"]);
     expect(ReportFormSchema.safeParse({ reason: "Other", details: "Pages manquantes" }).success).toBe(true);
   });
 

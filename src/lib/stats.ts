@@ -38,12 +38,10 @@ export function niceCeil(value: number): number {
 }
 
 
-const compactFormat = new Intl.NumberFormat("fr-FR", { notation: "compact", maximumFractionDigits: 1 });
+/** Compact figure for stat tiles, e.g. 1284 → "1,3 k" in French or "1.3K" in English. */
+export const formatCompact = (value: number, locale: string) =>
+  new Intl.NumberFormat(locale, { notation: "compact", maximumFractionDigits: 1 }).format(value);
 
-/** Compact figure for stat tiles, e.g. 1 284 → "1,3 k". */
-export const formatCompact = (value: number) => compactFormat.format(value);
-
-const dayLabelFormat = new Intl.DateTimeFormat("fr-FR", { day: "numeric", month: "short", timeZone: "UTC" });
-
-/** Short French label of a "YYYY-MM-DD" day, e.g. "30 sept.". */
-export const formatDay = (key: string) => dayLabelFormat.format(new Date(`${key}T00:00:00Z`));
+/** Short label of a "YYYY-MM-DD" day, e.g. "30 sept." in French or "Sep 30" in English. */
+export const formatDay = (key: string, locale: string) =>
+  new Intl.DateTimeFormat(locale, { day: "numeric", month: "short", timeZone: "UTC" }).format(new Date(`${key}T00:00:00Z`));

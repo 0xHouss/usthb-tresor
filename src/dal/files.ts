@@ -68,6 +68,7 @@ export async function getFiles({
   types,
   group,
   section,
+  languages,
   page,
 }: ParsedSearchParams) {
   const where: Prisma.FileWhereInput = {
@@ -77,6 +78,7 @@ export async function getFiles({
     semester: semester ? { equals: semester } : undefined,
     type: types?.length ? { in: types } : undefined,
     majorName: majors?.length ? { in: majors } : undefined,
+    language: languages?.length ? { in: languages } : undefined,
     academicYear: {
       gte: startYear,
       lte: endYear,
