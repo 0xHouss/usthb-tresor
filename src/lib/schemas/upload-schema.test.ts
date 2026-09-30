@@ -23,6 +23,7 @@ const validInput = () => ({
   module: "Algorithms",
   professor: "Dr. Dupont",
   type: "Exam",
+  language: "French",
   file: makeFile(),
 });
 
@@ -43,19 +44,19 @@ describe("UploadFormSchema", () => {
   describe("academicYear", () => {
     it("rejects a wrong format", () => {
       expect(errorsFor({ ...validInput(), academicYear: "2023-2024" }, "academicYear")).toContain(
-        "Academic year must be in format YYYY/YYYY"
+        "academicYearFormat"
       );
     });
 
     it("rejects when the second year is not first + 1", () => {
       expect(errorsFor({ ...validInput(), academicYear: "2023/2025" }, "academicYear")).toContain(
-        "The second year must be the first year plus one."
+        "academicYearConsecutive"
       );
     });
 
     it("rejects equal years", () => {
       expect(errorsFor({ ...validInput(), academicYear: "2023/2023" }, "academicYear")).toContain(
-        "The second year must be the first year plus one."
+        "academicYearConsecutive"
       );
     });
   });
@@ -63,20 +64,20 @@ describe("UploadFormSchema", () => {
   describe("file", () => {
     it("rejects a non-PDF file", () => {
       expect(errorsFor({ ...validInput(), file: makeFile({ type: "image/png" }) }, "file")).toContain(
-        "Only PDF files are allowed."
+        "pdfOnly"
       );
     });
 
     it("rejects an empty file", () => {
       expect(errorsFor({ ...validInput(), file: makeFile({ size: 0 }) }, "file")).toContain(
-        "Please provide a file."
+        "fileRequired"
       );
     });
 
     it("rejects a file over the size limit", () => {
       const tooBig = makeFile({ size: MAX_FILE_SIZE + 1 });
       expect(errorsFor({ ...validInput(), file: tooBig }, "file")).toContain(
-        "File must be 25 MB or smaller."
+        "fileTooLarge"
       );
     });
 
@@ -90,16 +91,35 @@ describe("UploadFormSchema", () => {
     });
   });
 
+  describe("anonymous", () => {
+    it("is true when the checkbox is checked", () => {
+      const result = UploadFormSchema.parse({ ...validInput(), anonymous: "on" });
+      expect(result.anonymous).toBe(true);
+    });
+
+    it("is false when the checkbox is unchecked", () => {
+      expect(UploadFormSchema.parse({ ...validInput(), anonymous: null }).anonymous).toBe(false);
+      expect(UploadFormSchema.parse(validInput()).anonymous).toBe(false);
+    });
+
+    it("rejects any other value", () => {
+      expect(errorsFor({ ...validInput(), anonymous: "yes" }, "anonymous").length).toBeGreaterThan(0);
+    });
+  });
+
   describe("enum fields", () => {
     it("rejects an empty selection", () => {
       expect(errorsFor({ ...validInput(), academicLevel: "" }, "academicLevel")).toContain(
-        "Please select an option."
+        "selectOption"
       );
       expect(errorsFor({ ...validInput(), semester: "" }, "semester")).toContain(
-        "Please select an option."
+        "selectOption"
       );
       expect(errorsFor({ ...validInput(), type: "" }, "type")).toContain(
-        "Please select an option."
+        "selectOption"
+      );
+      expect(errorsFor({ ...validInput(), language: "" }, "language")).toContain(
+        "selectOption"
       );
     });
 
@@ -107,6 +127,7 @@ describe("UploadFormSchema", () => {
       expect(errorsFor({ ...validInput(), academicLevel: "L9" }, "academicLevel").length).toBeGreaterThan(0);
       expect(errorsFor({ ...validInput(), semester: "S3" }, "semester").length).toBeGreaterThan(0);
       expect(errorsFor({ ...validInput(), type: "Essay" }, "type").length).toBeGreaterThan(0);
+      expect(errorsFor({ ...validInput(), language: "Arabic" }, "language")).toContain("invalidOption");
     });
   });
 });

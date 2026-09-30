@@ -2,7 +2,7 @@ import "server-only";
 
 import { prisma } from "@/lib/prisma";
 import { requireModerator } from "@/dal/session";
-import { AcademicLevel, FileStatus, FileType, Semester } from "@prisma/client";
+import { AcademicLevel, FileStatus, FileType, Language, Semester } from "@prisma/client";
 
 export type NewPendingFile = {
   driveId: string;
@@ -16,6 +16,8 @@ export type NewPendingFile = {
   majorName: string;
   moduleName: string;
   professorFullName: string;
+  language: Language;
+  anonymous: boolean;
 };
 
 /** Pending submissions awaiting review. Moderator/Admin only. */
@@ -37,6 +39,8 @@ export function createPendingFile(data: NewPendingFile) {
       majorName: data.majorName,
       moduleName: data.moduleName,
       professorFullName: data.professorFullName,
+      language: data.language,
+      anonymous: data.anonymous,
       uploadedBy: { connect: { email: data.uploaderEmail } },
     },
   });
@@ -45,14 +49,15 @@ export function createPendingFile(data: NewPendingFile) {
 /**
  * Promotes a pending submission to an approved `File`, creating the referenced
  * Major/Module/Professor on demand, then marks the submission Approved.
+ * Returns the new `File`.
  */
 export async function approvePendingFile(id: string) {
   // Atomic: either the File is created and the submission is marked Approved,
   // or neither happens — never a duplicate File with a still-Pending row.
-  await prisma.$transaction(async (tx) => {
+  return prisma.$transaction(async (tx) => {
     const pendingFile = await tx.pendingFile.findUniqueOrThrow({ where: { id } });
 
-    await tx.file.create({
+    const file = await tx.file.create({
       data: {
         driveId: pendingFile.driveId,
         type: pendingFile.type,
@@ -79,6 +84,8 @@ export async function approvePendingFile(id: string) {
             create: { fullName: pendingFile.professorFullName },
           },
         },
+        language: pendingFile.language,
+        anonymous: pendingFile.anonymous,
         uploadedBy: { connect: { email: pendingFile.uploadedByEmail } },
       },
     });
@@ -87,6 +94,8 @@ export async function approvePendingFile(id: string) {
       where: { id },
       data: { status: FileStatus.Approved },
     });
+
+    return file;
   });
 }
 

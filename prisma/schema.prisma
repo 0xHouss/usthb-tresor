@@ -29,6 +29,11 @@ model User {
 
   File File[]
   PendingFile PendingFile[]
+  events      EventLog[]
+  comments    Comment[]
+
+  reportsFiled   Report[] @relation("ReportsFiled")
+  reportsHandled Report[] @relation("ReportsHandled")
 }
 
 model Account {
@@ -118,6 +123,12 @@ enum Semester {
   S2
 }
 
+// Language a document is written in (independent of the UI language).
+enum Language {
+  French
+  English
+}
+
 model PendingFile {
   id      String @id @default(cuid())
   driveId String @unique
@@ -135,6 +146,11 @@ model PendingFile {
   professorFullName String
 
   status     FileStatus @default(Pending)
+
+  language Language @default(French)
+
+  // Hides the uploader from public views; moderators and admins still see it.
+  anonymous Boolean @default(false)
 
   uploadedAt      DateTime @default(now())
 
@@ -165,8 +181,17 @@ model File {
 
   uploadedAt DateTime   @default(now())
 
+  language Language @default(French)
+
+  // Hides the uploader from public views; moderators and admins still see it.
+  anonymous Boolean @default(false)
+
   uploadedBy      User   @relation(fields: [uploadedByEmail], references: [email])
   uploadedByEmail String
+
+  comments  Comment[]
+  reports   Report[]
+  downloads FileDownload[]
 }
 
 model Professor {
@@ -188,4 +213,111 @@ model Major {
   name String @unique
 
   File File[]
+}
+
+// Download tracking. Deliberately anonymous: no user is stored.
+
+model FileDownload {
+  id String @id @default(cuid())
+
+  file   File   @relation(fields: [fileId], references: [id], onDelete: Cascade)
+  fileId String
+
+  createdAt DateTime @default(now())
+
+  @@index([fileId])
+  @@index([createdAt])
+}
+
+// Comments
+
+model Comment {
+  id      String @id @default(cuid())
+  content String
+
+  file   File   @relation(fields: [fileId], references: [id], onDelete: Cascade)
+  fileId String
+
+  author   User   @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  authorId String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([fileId, createdAt])
+}
+
+// Problem reports
+
+enum ReportReason {
+  CorruptedFile
+  WrongMetadata
+  Copyright
+  Other
+}
+
+enum ReportStatus {
+  Open
+  Resolved
+  Dismissed
+}
+
+model Report {
+  id      String       @id @default(cuid())
+  reason  ReportReason
+  details String?
+  status  ReportStatus @default(Open)
+
+  // Kept null once the file is deleted, so the report history survives.
+  file   File?   @relation(fields: [fileId], references: [id], onDelete: SetNull)
+  fileId String?
+  // Snapshot of the file's details, for reports whose file was deleted.
+  fileMetadata Json
+
+  reporter   User   @relation("ReportsFiled", fields: [reporterId], references: [id], onDelete: Cascade)
+  reporterId String
+
+  resolvedBy   User?     @relation("ReportsHandled", fields: [resolvedById], references: [id], onDelete: SetNull)
+  resolvedById String?
+  resolvedAt   DateTime?
+
+  createdAt DateTime @default(now())
+
+  @@index([status, createdAt])
+  @@index([fileId])
+}
+
+// Audit log
+
+enum EventType {
+  UserLogin
+  FileSubmitted
+  FileApproved
+  FileRejected
+  CommentCreated
+  CommentDeleted
+  ReportCreated
+  ReportResolved
+  ReportDismissed
+  FileDeleted
+}
+
+model EventLog {
+  id   String    @id @default(cuid())
+  type EventType
+
+  // Who performed the action; kept null if that user is later deleted.
+  actor   User?   @relation(fields: [actorId], references: [id], onDelete: SetNull)
+  actorId String?
+
+  // Id of the record the event is about (PendingFile, File, ...), if any.
+  targetId String?
+  // Snapshot of the target's details, so the entry still reads well if it's deleted.
+  metadata Json?
+
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([type, createdAt])
+  @@index([actorId])
 }

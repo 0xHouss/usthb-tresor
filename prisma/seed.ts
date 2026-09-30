@@ -55,6 +55,7 @@ async function main() {
   const fileTypes = ['Lecture', 'DW_Worksheet', 'PW_Worksheet', 'Interrogation', 'Exam', 'PW_Exam'] as const;
   const academicLevels = ['L1', 'L2', 'L3', 'M1', 'M2', 'D1', 'D2', 'D3', 'ING1', 'ING2', 'ING3', 'ING4', 'ING5'] as const;
   const semesters = ['S1', 'S2'] as const;
+  const languages = ['French', 'English'] as const;
 
   // Create 100 dummy files
   await Promise.all(
@@ -71,6 +72,7 @@ async function main() {
           majorName: faker.helpers.arrayElement(majors).name,
           moduleName: faker.helpers.arrayElement(modules).name,
           professorFullName: faker.helpers.arrayElement(professors).fullName,
+          language: faker.helpers.arrayElement(languages),
           uploadedByEmail: 'admin@example.com',
         },
       })
@@ -92,6 +94,7 @@ async function main() {
           majorName: faker.helpers.arrayElement(majors).name,
           moduleName: faker.helpers.arrayElement(modules).name,
           professorFullName: faker.helpers.arrayElement(professors).fullName,
+          language: faker.helpers.arrayElement(languages),
           uploadedByEmail: 'admin@example.com',
         },
       })

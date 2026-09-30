@@ -1,13 +1,16 @@
 import { getCurrentUser } from "@/dal/session"
+import { Link } from "@/i18n/navigation"
+import { getTranslations } from "next-intl/server"
 import Image from "next/image"
-import Link from "next/link"
+import { LocaleSwitcher } from "./locale-switcher"
 import MobileHeaderMenu from "./mobile-header-menu"
 import { NavLink } from "./nav-link"
 import { buttonVariants } from "./ui/button"
 import UserButton from "./user-button"
 
 export async function Header() {
-  const user = await getCurrentUser()
+  const [user, t] = await Promise.all([getCurrentUser(), getTranslations("nav")])
+  const isStaff = user?.role === "Admin" || user?.role === "Moderator"
 
   return (
     <header className="sticky top-0 border-b-2 bg-background z-50">
@@ -23,23 +26,28 @@ export async function Header() {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-2">
-            <NavLink href="/browse" label="Resources"  />
-            <NavLink href="/contribute" label="Contribute" />
-            <NavLink href="/contact" label="Contact Us" />
+            <NavLink href="/browse" label={t("resources")} />
+            <NavLink href="/contribute" label={t("contribute")} />
+            <NavLink href="/contact" label={t("contact")} />
 
-            {["Admin", "Moderator"].includes(user?.role || "Visitor") && (
-              <NavLink href="/submissions" label="Submissions" />
+            {isStaff && (
+              <>
+                <NavLink href="/submissions" label={t("submissions")} />
+                <NavLink href="/admin" label={t("administration")} />
+              </>
             )}
           </div>
         </div>
 
         {/* Actions */}
         <div className="flex gap-3 items-center">
+          <LocaleSwitcher />
+
           {user ? (
             <UserButton user={user} />
           ) : (
             <Link className={buttonVariants()} href="/login">
-              Login
+              {t("login")}
             </Link>
           )}
 

@@ -38,5 +38,7 @@ Tests are unit-only (Node env, Vitest), matched by `src/**/*.test.ts`.
 ## Conventions
 
 - **Branches:** feature branches off `dev`, merged into `dev` via PR when the feature is done; `dev` is merged into `main` via PR once a meaningful batch of features is tested. Don't commit directly to `main`.
-- **UI language:** all user-facing text is in French for now (a fr/en language selector is planned later).
+- **UI language:** the UI is in French (default) and English via **next-intl**, with the locale as a URL prefix (`/fr/...`, `/en/...`). Pages live under `src/app/[locale]/`; `src/proxy.ts` picks the locale; `/api` routes stay unprefixed. Never hard-code user-facing text: add the key to **both** `messages/fr.json` and `messages/en.json` (a test checks they match) and use `useTranslations` / `getTranslations`. Keys are type-checked against `fr.json`. Use `Link` / `redirect` / `useRouter` / `usePathname` from `@/i18n/navigation` (not `next/link` or `next/navigation`) so the locale is kept, and `revalidateLocalized` (`src/lib/revalidate.ts`) instead of `revalidatePath`. Enum labels (file types, languages, ...) live under `enums` in the catalogues.
+- **Errors in actions:** zod schemas and `AppError` (`src/lib/errors.ts`) carry message *keys* from the `errors` catalogue; actions translate them with `getErrorTranslator()`. Unexpected errors are shown as a generic message.
+- **Document language** (`File.language`, `PendingFile.language`) is separate from the UI language: document metadata (module names, etc.) stays in the document's own language.
 - Conventional commits with scopes, e.g. `feat(storage):`, `fix(ui/browse-page):`.

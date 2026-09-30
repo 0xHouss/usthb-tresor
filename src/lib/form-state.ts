@@ -1,4 +1,5 @@
 import { ZodError } from "zod";
+import { AppError } from "./errors";
 
 export type FormState = {
   status: 'UNSET' | 'SUCCESS' | 'ERROR';
@@ -20,19 +21,27 @@ export const EMPTY_FORM_STATE: FormState = {
   timestamp: Date.now(),
 };
 
-export function fromErrorToFormState(error: unknown, formData: FormData): FormState {
+/**
+ * Converts a failed action's error to a form state. `translate` maps message
+ * keys to text: schema messages for field errors, AppError keys, and
+ * "unexpected" for anything else, whose details stay server-side.
+ */
+export function fromErrorToFormState(
+  error: unknown,
+  formData: FormData,
+  translate: (key: string) => string,
+): FormState {
   if (error instanceof ZodError) {
+    const fieldErrors: Record<string, string[] | undefined> = error.flatten().fieldErrors;
     return toFormState('ERROR', formData, {
-      fieldErrors: error.flatten().fieldErrors,
+      fieldErrors: Object.fromEntries(
+        Object.entries(fieldErrors).map(([field, messages]) => [field, messages?.map(translate)]),
+      ),
     })
-  } else if (error instanceof Error) {
-    return toFormState('ERROR', formData, {
-      message: error.message
-    });
+  } else if (error instanceof AppError) {
+    return toFormState('ERROR', formData, { message: translate(error.key) });
   } else {
-    return toFormState('ERROR', formData, {
-      message: 'An error occured !'
-    });
+    return toFormState('ERROR', formData, { message: translate('unexpected') });
   }
 };
 

@@ -3,6 +3,7 @@
 import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
 import { cn } from "@/lib/utils";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useTranslations } from "next-intl";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { type ReactNode, useCallback } from "react";
 
@@ -24,6 +25,7 @@ export function PaginationWithLinks({
   page,
   pageSearchParam,
 }: PaginationWithLinksProps) {
+  const t = useTranslations("pagination");
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -78,7 +80,7 @@ export function PaginationWithLinks({
       if (page > 3) {
         items.push(
           <PaginationItem key="ellipsis-start">
-            <PaginationEllipsis />
+            <PaginationEllipsis label={t("morePages")} />
           </PaginationItem>,
         );
       }
@@ -99,7 +101,7 @@ export function PaginationWithLinks({
       if (page < totalPageCount - 2) {
         items.push(
           <PaginationItem key="ellipsis-end">
-            <PaginationEllipsis />
+            <PaginationEllipsis label={t("morePages")} />
           </PaginationItem>,
         );
       }
@@ -121,16 +123,19 @@ export function PaginationWithLinks({
       {pageSizeSelectOptions && (
         <div className="flex flex-col gap-4 flex-1">
           <SelectRowsPerPage
+            label={t("rowsPerPage")}
             options={pageSizeSelectOptions.pageSizeOptions}
             setPageSize={navToPageSize}
             pageSize={pageSize}
           />
         </div>
       )}
-      <Pagination className={cn({ "md:justify-end": pageSizeSelectOptions })}>
+      <Pagination aria-label={t("label")} className={cn({ "md:justify-end": pageSizeSelectOptions })}>
         <PaginationContent className="max-sm:gap-0">
           <PaginationItem>
             <PaginationPrevious
+              label={t("previous")}
+              aria-label={t("goPrevious")}
               href={buildLink(Math.max(page - 1, 1))}
               aria-disabled={page === 1}
               tabIndex={page === 1 ? -1 : undefined}
@@ -140,6 +145,8 @@ export function PaginationWithLinks({
           {renderPageNumbers()}
           <PaginationItem>
             <PaginationNext
+              label={t("next")}
+              aria-label={t("goNext")}
               href={buildLink(Math.min(page + 1, totalPageCount))}
               aria-disabled={page === totalPageCount}
               tabIndex={page === totalPageCount ? -1 : undefined}
@@ -153,21 +160,23 @@ export function PaginationWithLinks({
 }
 
 function SelectRowsPerPage({
+  label,
   options,
   setPageSize,
   pageSize,
 }: {
+  label: string;
   options: number[];
   setPageSize: (newSize: number) => void;
   pageSize: number;
 }) {
   return (
     <div className="flex items-center gap-4">
-      <span className="whitespace-nowrap text-sm">Rows per page</span>
+      <span className="whitespace-nowrap text-sm">{label}</span>
 
       <Select value={String(pageSize)} onValueChange={(value) => setPageSize(Number(value))}>
         <SelectTrigger>
-          <SelectValue placeholder="Select page size">{String(pageSize)}</SelectValue>
+          <SelectValue>{String(pageSize)}</SelectValue>
         </SelectTrigger>
         <SelectContent>
           {options.map((option) => (

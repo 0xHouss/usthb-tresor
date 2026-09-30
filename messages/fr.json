@@ -1,0 +1,386 @@
+{
+  "metadata": {
+    "title": "USTHB Trésor",
+    "description": "Tout le savoir de l'USTHB, au même endroit"
+  },
+  "nav": {
+    "resources": "Ressources",
+    "contribute": "Contribuer",
+    "contact": "Contact",
+    "submissions": "Soumissions",
+    "administration": "Administration",
+    "login": "Connexion",
+    "toggleMenu": "Ouvrir ou fermer le menu"
+  },
+  "userMenu": {
+    "open": "Menu du compte",
+    "settings": "Paramètres",
+    "logout": "Se déconnecter"
+  },
+  "theme": {
+    "toggle": "Changer de thème",
+    "light": "Clair",
+    "dark": "Sombre",
+    "system": "Système"
+  },
+  "localeSwitcher": {
+    "label": "Changer de langue",
+    "fr": "Français",
+    "en": "English"
+  },
+  "enums": {
+    "fileTypes": {
+      "Lecture": "Cours",
+      "DW_Worksheet": "TD",
+      "PW_Worksheet": "TP",
+      "Interrogation": "Interrogation",
+      "Exam": "Examen",
+      "PW_Exam": "Examen de TP"
+    },
+    "languages": {
+      "French": "Français",
+      "English": "Anglais"
+    },
+    "semesters": {
+      "S1": "Semestre 1",
+      "S2": "Semestre 2"
+    },
+    "eventTypes": {
+      "UserLogin": "Connexion",
+      "FileSubmitted": "Fichier soumis",
+      "FileApproved": "Fichier approuvé",
+      "FileRejected": "Fichier rejeté",
+      "CommentCreated": "Commentaire publié",
+      "CommentDeleted": "Commentaire supprimé",
+      "ReportCreated": "Signalement",
+      "ReportResolved": "Signalement résolu",
+      "ReportDismissed": "Signalement rejeté",
+      "FileDeleted": "Fichier supprimé"
+    },
+    "reportReasons": {
+      "CorruptedFile": "Fichier corrompu",
+      "WrongMetadata": "Informations erronées",
+      "Copyright": "Droits d'auteur",
+      "Other": "Autre"
+    },
+    "reportStatuses": {
+      "Open": "Ouvert",
+      "Resolved": "Résolu",
+      "Dismissed": "Rejeté"
+    }
+  },
+  "home": {
+    "badge": "La plateforme des étudiants de l'USTHB",
+    "heroTitle": "Tout le savoir de l'USTHB, ",
+    "heroHighlight": "au même endroit.",
+    "heroText": "Votre espace collaboratif de ressources académiques : anciens examens, cours, TD et bien plus. Cherchez, partagez et apprenez avec la communauté de l'USTHB. 🚀",
+    "browseNow": "Parcourir",
+    "contribute": "Contribuer",
+    "stats": {
+      "resources": "Ressources",
+      "majors": "Filières",
+      "modules": "Modules",
+      "contributors": "Contributeurs"
+    },
+    "browseByType": "Parcourir par type",
+    "viewAll": "Tout voir",
+    "howItWorks": "Comment ça marche",
+    "steps": {
+      "browse": {
+        "title": "Parcourez",
+        "text": "Filtrez par filière, module, type, niveau et année pour trouver exactement ce qu'il vous faut."
+      },
+      "contribute": {
+        "title": "Contribuez",
+        "text": "Partagez vos cours, TD et anciens examens en quelques clics, avec toutes leurs informations."
+      },
+      "reviewed": {
+        "title": "Vérifié",
+        "text": "Chaque soumission est vérifiée par un modérateur avant d'être publiée pour la communauté."
+      }
+    },
+    "browseByMajor": "Parcourir par filière",
+    "recentUploads": "Ajouts récents",
+    "empty": "Aucune ressource publiée pour le moment. Soyez le premier à contribuer !",
+    "contributeResource": "Partager une ressource"
+  },
+  "browse": {
+    "showing": "{start}–{end} sur {total, plural, one {# résultat} other {# résultats}}",
+    "noFiles": "Aucun fichier trouvé..."
+  },
+  "filters": {
+    "title": "Filtres",
+    "clearAll": "Tout effacer",
+    "toggle": "Afficher ou masquer les filtres",
+    "selected": "{count, plural, one {# sélectionné} other {# sélectionnés}}",
+    "major": "Filière",
+    "selectMajor": "Choisir une filière...",
+    "searchMajor": "Rechercher une filière...",
+    "noMajor": "Aucune filière trouvée.",
+    "level": "Niveau",
+    "selectLevels": "Choisir des niveaux...",
+    "searchLevels": "Rechercher un niveau...",
+    "noLevel": "Aucun niveau trouvé.",
+    "sectionGroup": "Section et groupe",
+    "section": "Section",
+    "sectionPlaceholder": "Section...",
+    "group": "Groupe",
+    "groupPlaceholder": "Groupe...",
+    "year": "Année universitaire",
+    "startYear": "Année de début",
+    "endYear": "Année de fin",
+    "yearTo": "à",
+    "semester": "Semestre",
+    "module": "Module",
+    "selectModules": "Choisir des modules...",
+    "searchModules": "Rechercher un module...",
+    "noModule": "Aucun module trouvé.",
+    "professor": "Enseignant",
+    "selectProfessors": "Choisir des enseignants...",
+    "searchProfessors": "Rechercher un enseignant...",
+    "noProfessor": "Aucun enseignant trouvé.",
+    "type": "Type de fichier",
+    "language": "Langue",
+    "apply": "Appliquer les filtres"
+  },
+  "contribute": {
+    "title": "Partager une ressource",
+    "major": "Filière",
+    "majorPlaceholder": "Choisir ou saisir une filière...",
+    "majorSearch": "Rechercher une filière...",
+    "majorEmpty": "Aucune filière trouvée.",
+    "level": "Niveau",
+    "levelPlaceholder": "Choisir un niveau",
+    "section": "Section",
+    "sectionPlaceholder": "ex. A",
+    "group": "Groupe (facultatif)",
+    "groupPlaceholder": "ex. 1",
+    "year": "Année universitaire",
+    "yearPlaceholder": "ex. 2024/2025",
+    "semester": "Semestre",
+    "semesterPlaceholder": "Choisir un semestre",
+    "module": "Module",
+    "modulePlaceholder": "Choisir ou saisir un module...",
+    "moduleSearch": "Rechercher un module...",
+    "moduleEmpty": "Aucun module trouvé.",
+    "professor": "Enseignant",
+    "professorPlaceholder": "Choisir ou saisir un enseignant...",
+    "professorSearch": "Rechercher un enseignant...",
+    "professorEmpty": "Aucun enseignant trouvé.",
+    "comboboxSelect": "Choisir",
+    "type": "Type de ressource",
+    "typePlaceholder": "Choisir un type",
+    "language": "Langue du document",
+    "languagePlaceholder": "Choisir une langue",
+    "fileHint": "Cliquez pour ajouter un PDF ({maxFileSizeMb} Mo max.)",
+    "fileTooLarge": "Le fichier ne doit pas dépasser {maxFileSizeMb} Mo.",
+    "anonymous": "Publier anonymement",
+    "anonymousHelp": "Votre nom ne sera pas affiché publiquement. Les modérateurs peuvent toujours voir qui a soumis le fichier.",
+    "submit": "Envoyer",
+    "uploading": "Envoi en cours...",
+    "success": "Fichier envoyé ! Il sera publié après vérification."
+  },
+  "submissions": {
+    "title": "Soumissions à vérifier",
+    "subtitle": "Approuvez ou rejetez les fichiers envoyés par les contributeurs",
+    "columns": {
+      "type": "Type",
+      "module": "Module",
+      "major": "Filière",
+      "level": "Niveau",
+      "year": "Année",
+      "semester": "Semestre",
+      "section": "Section",
+      "professor": "Enseignant",
+      "language": "Langue",
+      "uploadedBy": "Envoyé par"
+    },
+    "anonymous": "Anonyme",
+    "approve": "Approuver",
+    "reject": "Rejeter",
+    "open": "Ouvrir dans Drive",
+    "approved": "Fichier approuvé.",
+    "rejected": "Fichier rejeté.",
+    "approveFailed": "Impossible d'approuver le fichier.",
+    "rejectFailed": "Impossible de rejeter le fichier.",
+    "empty": "Aucune soumission en attente",
+    "emptyHint": "Tous les fichiers ont été vérifiés."
+  },
+  "pagination": {
+    "label": "Pagination",
+    "previous": "Précédent",
+    "next": "Suivant",
+    "goPrevious": "Page précédente",
+    "goNext": "Page suivante",
+    "morePages": "Autres pages",
+    "rowsPerPage": "Lignes par page"
+  },
+  "resourceCard": {
+    "download": "Télécharger",
+    "details": "Détails :",
+    "major": "Filière :",
+    "professor": "Enseignant :"
+  },
+  "file": {
+    "back": "Retour aux ressources",
+    "download": "Télécharger",
+    "openInDrive": "Ouvrir dans Drive",
+    "preview": "Aperçu : {title}",
+    "details": "Détails",
+    "fields": {
+      "major": "Filière",
+      "module": "Module",
+      "professor": "Enseignant",
+      "level": "Niveau",
+      "year": "Année universitaire",
+      "semester": "Semestre",
+      "section": "Section",
+      "group": "Groupe",
+      "language": "Langue",
+      "addedOn": "Ajouté le"
+    },
+    "sharedBy": "Partagé par <b>{name}</b>",
+    "sharedAnonymously": "Partagé anonymement"
+  },
+  "comments": {
+    "title": "Commentaires ({count})",
+    "empty": "Aucun commentaire pour le moment.",
+    "placeholder": "Une remarque, une correction, un merci ?",
+    "label": "Votre commentaire",
+    "publish": "Publier",
+    "published": "Commentaire publié.",
+    "loginPrompt": "<link>Connectez-vous</link> pour laisser un commentaire.",
+    "delete": "Supprimer le commentaire",
+    "deleteTitle": "Supprimer ce commentaire ?",
+    "deleteDescription": "Cette action est définitive.",
+    "cancel": "Annuler",
+    "confirmDelete": "Supprimer",
+    "deleted": "Commentaire supprimé.",
+    "deleteFailed": "Impossible de supprimer le commentaire."
+  },
+  "report": {
+    "trigger": "Signaler un problème",
+    "title": "Signaler un problème",
+    "description": "Votre signalement sera examiné par l'équipe de modération.",
+    "reason": "Motif",
+    "reasonPlaceholder": "Choisir un motif",
+    "details": "Détails",
+    "detailsPlaceholder": "Décrivez le problème (obligatoire pour « Autre »)",
+    "submit": "Envoyer",
+    "sent": "Merci ! Votre signalement a été transmis à la modération."
+  },
+  "admin": {
+    "title": "Administration",
+    "sections": {
+      "dashboard": "Tableau de bord",
+      "reports": "Signalements",
+      "logs": "Journal"
+    }
+  },
+  "dashboard": {
+    "tiles": {
+      "files": "Fichiers publiés",
+      "pendingFiles": "Soumissions en attente",
+      "openReports": "Signalements ouverts",
+      "users": "Utilisateurs inscrits",
+      "recentDownloads": "Téléchargements (30 jours)",
+      "comments": "Commentaires"
+    },
+    "downloadsPerDay": "Téléchargements par jour",
+    "submissionsPerDay": "Soumissions par jour",
+    "topFiles": "Fichiers les plus téléchargés",
+    "noDownloads": "Aucun téléchargement pour le moment.",
+    "topContributors": "Contributeurs les plus actifs",
+    "noFiles": "Aucun fichier publié pour le moment.",
+    "fileCount": "{count, plural, one {# fichier} other {# fichiers}}"
+  },
+  "chart": {
+    "total": "{total} sur {days} jours",
+    "units": {
+      "downloads": "{count, plural, one {# téléchargement} other {# téléchargements}}",
+      "submissions": "{count, plural, one {# soumission} other {# soumissions}}"
+    },
+    "columnLabel": "{day} : {value}",
+    "showData": "Voir les données",
+    "day": "Jour",
+    "count": "Nombre"
+  },
+  "logs": {
+    "title": "Journal d'activité",
+    "subtitle": "Connexions et actions de modération ({count, plural, one {# entrée} other {# entrées}})",
+    "allEvents": "Tous les événements",
+    "filterLabel": "Filtrer par type d'événement",
+    "columns": {
+      "date": "Date",
+      "event": "Événement",
+      "user": "Utilisateur",
+      "details": "Détails"
+    },
+    "empty": "Aucun événement",
+    "emptyHint": "Rien n'a encore été enregistré pour ce filtre."
+  },
+  "events": {
+    "anonymous": "anonyme",
+    "moderated": "par la modération"
+  },
+  "reports": {
+    "title": "Signalements",
+    "subtitle": "Problèmes signalés par les utilisateurs sur les fichiers publiés",
+    "allStatuses": "Tous les statuts",
+    "filterLabel": "Filtrer par statut",
+    "columns": {
+      "date": "Date",
+      "file": "Fichier",
+      "reason": "Motif",
+      "reporter": "Signalé par",
+      "status": "Statut"
+    },
+    "deletedFile": "{file} (supprimé)",
+    "handledBy": "par {name}, le {date}",
+    "handledOn": "le {date}",
+    "resolve": "Résoudre",
+    "dismiss": "Rejeter",
+    "deleteFile": "Supprimer le fichier",
+    "deleteTitle": "Supprimer ce fichier ?",
+    "deleteDescription": "Le fichier sera retiré du site et de Google Drive, avec ses commentaires. Ses signalements ouverts seront marqués comme résolus. Cette action est définitive.",
+    "cancel": "Annuler",
+    "confirmDelete": "Supprimer",
+    "resolved": "Signalement résolu.",
+    "dismissed": "Signalement rejeté.",
+    "fileDeleted": "Fichier supprimé.",
+    "resolveFailed": "Impossible de résoudre le signalement.",
+    "dismissFailed": "Impossible de rejeter le signalement.",
+    "deleteFailed": "Impossible de supprimer le fichier.",
+    "empty": "Aucun signalement",
+    "emptyHint": "Rien à traiter pour ce filtre."
+  },
+  "login": {
+    "title": "Bon retour parmi nous",
+    "subtitle": "Connectez-vous à votre compte",
+    "google": "Se connecter avec Google",
+    "terms": "En continuant, vous acceptez nos <terms>conditions d'utilisation</terms> et notre <privacy>politique de confidentialité</privacy>."
+  },
+  "notFound": {
+    "title": "Page introuvable",
+    "text": "La page que vous cherchez n'existe pas ou a été déplacée.",
+    "back": "Retour à l'accueil"
+  },
+  "errors": {
+    "selectOption": "Veuillez choisir une option.",
+    "invalidOption": "Veuillez choisir une option valide.",
+    "academicYearFormat": "L'année universitaire doit être au format AAAA/AAAA.",
+    "academicYearConsecutive": "La deuxième année doit suivre la première.",
+    "fileRequired": "Veuillez ajouter un fichier.",
+    "pdfOnly": "Seuls les fichiers PDF sont acceptés.",
+    "fileTooLarge": "Le fichier ne doit pas dépasser {maxFileSizeMb} Mo.",
+    "commentEmpty": "Le commentaire est vide.",
+    "commentTooLong": "Le commentaire ne doit pas dépasser {commentMaxLength} caractères.",
+    "reasonRequired": "Veuillez choisir un motif.",
+    "detailsRequired": "Veuillez décrire le problème.",
+    "detailsTooLong": "Les détails ne doivent pas dépasser {reportDetailsMaxLength} caractères.",
+    "fileGone": "Ce fichier n'existe plus.",
+    "alreadyReported": "Vous avez déjà signalé ce fichier. Votre signalement est en cours de traitement.",
+    "invalid": "Valeur invalide.",
+    "unexpected": "Une erreur est survenue. Veuillez réessayer."
+  }
+}

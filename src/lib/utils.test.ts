@@ -1,6 +1,7 @@
 import { AcademicLevel, FileType, Semester } from "@prisma/client";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
+  formatDateTime,
   getCurrentAcademicYear,
   getFileDownloadUrl,
   getFileUrl,
@@ -84,5 +85,19 @@ describe("file URL builders", () => {
     expect(getFileDownloadUrl("abc123")).toBe(
       "https://drive.usercontent.google.com/download?id=abc123&export=download&confirm=t"
     );
+  });
+});
+
+describe("formatDateTime", () => {
+  it("formats as a short date and time in Algiers time (UTC+1)", () => {
+    expect(formatDateTime(new Date("2026-09-30T10:05:00Z"), "fr")).toBe("30/09/2026 11:05");
+  });
+
+  it("follows the locale's conventions", () => {
+    expect(formatDateTime(new Date("2026-09-30T10:05:00Z"), "en").replace(/\s/g, " ")).toBe("9/30/26, 11:05 AM");
+  });
+
+  it("rolls over to the next day in Algiers time", () => {
+    expect(formatDateTime(new Date("2026-01-01T23:30:00Z"), "fr")).toBe("02/01/2026 00:30");
   });
 });

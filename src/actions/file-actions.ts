@@ -1,11 +1,15 @@
 "use server"
 
+import { logEvent } from "@/dal/events"
 import { requireModerator, requireUser } from "@/dal/session"
 import { approvePendingFile, createPendingFile, rejectPendingFile } from "@/dal/pending-files"
+import { fileEventMetadata } from "@/lib/events"
+import { getErrorTranslator } from "@/lib/action-errors"
 import { FormState, fromErrorToFormState, toFormState } from "@/lib/form-state"
 import { uploadPublicFile } from "@/lib/google-drive"
+import { revalidateLocalized } from "@/lib/revalidate"
 import { UploadFormSchema } from "@/lib/schemas/upload-schema"
-import { revalidatePath } from "next/cache"
+import { getTranslations } from "next-intl/server"
 
 export async function uploadFile(state: FormState, formData: FormData): Promise<FormState> {
   try {
@@ -21,6 +25,8 @@ export async function uploadFile(state: FormState, formData: FormData): Promise<
       module: formData.get('module'),
       professor: formData.get('professor'),
       type: formData.get('type'),
+      language: formData.get('language'),
+      anonymous: formData.get('anonymous'),
       file: formData.get('file'),
     });
 
@@ -30,7 +36,7 @@ export async function uploadFile(state: FormState, formData: FormData): Promise<
     // Upload to Drive and make it public (the app's status flag controls listing, not access).
     const driveId = await uploadPublicFile(buffer, fileName);
 
-    await createPendingFile({
+    const pendingFile = await createPendingFile({
       driveId,
       uploaderEmail: user.email,
       type: metadata.type,
@@ -42,29 +48,45 @@ export async function uploadFile(state: FormState, formData: FormData): Promise<
       majorName: metadata.major,
       moduleName: metadata.module,
       professorFullName: metadata.professor,
+      language: metadata.language,
+      anonymous: metadata.anonymous,
     });
 
-    revalidatePath("/contribute");
+    await logEvent({
+      type: "FileSubmitted",
+      actorId: user.id,
+      targetId: pendingFile.id,
+      metadata: fileEventMetadata(pendingFile),
+    });
 
+    revalidateLocalized("/contribute");
+
+    const t = await getTranslations("contribute");
     return toFormState('SUCCESS', formData, {
-      message: 'File uploaded successfully!',
+      message: t("success"),
       reset: true,
     });
   } catch (error) {
     console.error("File upload error:", error);
 
-    return fromErrorToFormState(error, formData)
+    return fromErrorToFormState(error, formData, await getErrorTranslator())
   }
 }
 
 export async function approveFile(fileId: string) {
-  await requireModerator()
+  const moderator = await requireModerator()
 
   try {
-    await approvePendingFile(fileId)
+    const file = await approvePendingFile(fileId)
+    await logEvent({
+      type: "FileApproved",
+      actorId: moderator.id,
+      targetId: file.id,
+      metadata: fileEventMetadata(file),
+    })
 
-    revalidatePath("/submissions")
-    revalidatePath("/browse")
+    revalidateLocalized("/submissions")
+    revalidateLocalized("/browse")
     return { success: true }
   } catch (error) {
     console.error("Failed to approve file:", error)
@@ -73,13 +95,19 @@ export async function approveFile(fileId: string) {
 }
 
 export async function rejectFile(fileId: string) {
-  await requireModerator()
+  const moderator = await requireModerator()
 
   try {
-    await rejectPendingFile(fileId)
+    const pendingFile = await rejectPendingFile(fileId)
+    await logEvent({
+      type: "FileRejected",
+      actorId: moderator.id,
+      targetId: pendingFile.id,
+      metadata: fileEventMetadata(pendingFile),
+    })
 
-    revalidatePath("/submissions")
-    revalidatePath("/browse")
+    revalidateLocalized("/submissions")
+    revalidateLocalized("/browse")
     return { success: true }
   } catch (error) {
     console.error("Failed to reject file:", error)

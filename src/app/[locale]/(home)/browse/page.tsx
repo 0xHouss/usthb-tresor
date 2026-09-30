@@ -2,17 +2,18 @@ import { getAcademicYearRange, getFiles } from "@/dal/files";
 import { getMajors, getModules, getProfessors } from "@/dal/taxonomy";
 import { FileFilterSidebar } from "@/components/file-filter-sidebar";
 import NoDataIllustration from "@/components/svg/no-data";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { PAGE_SIZE } from "@/lib/utils";
 import { parseSearchParams, type SearchParams } from "@/lib/search-params";
-import { PaginationWithLinks } from "../../../components/pagination-with-links";
+import { PaginationWithLinks } from "@/components/pagination-with-links";
+import { getTranslations } from "next-intl/server";
 import ResourceCard from "@/components/resource-card";
 
 export type { SearchParams, ParsedSearchParams } from "@/lib/search-params";
 
 export default async function BrowsePage(props: { searchParams: SearchParams }) {
   const searchParams = await parseSearchParams(props.searchParams);
+  const t = await getTranslations("browse");
 
   const { files, totalCount } = await getFiles(searchParams);
   const majors = await getMajors()
@@ -37,7 +38,7 @@ export default async function BrowsePage(props: { searchParams: SearchParams }) 
       </aside>
 
       <main className="flex-1 flex flex-col gap-4">
-        <p className="text-sm text-muted-foreground">Showing {start}–{end} of {totalCount} result{totalCount !== 1 ? "s" : ""}</p>
+        <p className="text-sm text-muted-foreground">{t("showing", { start: totalCount ? start : 0, end, total: totalCount })}</p>
 
         {files.length ? (
           <>
@@ -59,7 +60,7 @@ export default async function BrowsePage(props: { searchParams: SearchParams }) 
         ) : (
           <div className="flex flex-col justify-center items-center gap-6 flex-1">
             <NoDataIllustration height={300} width={300} />
-            <p className="text-muted-foreground text-xl mt-4">No files found...</p>
+            <p className="text-muted-foreground text-xl mt-4">{t("noFiles")}</p>
           </div>
         )}
       </main>

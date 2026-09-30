@@ -1,0 +1,386 @@
+{
+  "metadata": {
+    "title": "USTHB Trésor",
+    "description": "All of USTHB's knowledge in one place"
+  },
+  "nav": {
+    "resources": "Resources",
+    "contribute": "Contribute",
+    "contact": "Contact",
+    "submissions": "Submissions",
+    "administration": "Administration",
+    "login": "Log in",
+    "toggleMenu": "Toggle menu"
+  },
+  "userMenu": {
+    "open": "Account menu",
+    "settings": "Settings",
+    "logout": "Log out"
+  },
+  "theme": {
+    "toggle": "Toggle theme",
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System"
+  },
+  "localeSwitcher": {
+    "label": "Change language",
+    "fr": "Français",
+    "en": "English"
+  },
+  "enums": {
+    "fileTypes": {
+      "Lecture": "Lecture",
+      "DW_Worksheet": "DW Worksheet",
+      "PW_Worksheet": "PW Worksheet",
+      "Interrogation": "Interrogation",
+      "Exam": "Exam",
+      "PW_Exam": "PW Exam"
+    },
+    "languages": {
+      "French": "French",
+      "English": "English"
+    },
+    "semesters": {
+      "S1": "Semester 1",
+      "S2": "Semester 2"
+    },
+    "eventTypes": {
+      "UserLogin": "Sign-in",
+      "FileSubmitted": "File submitted",
+      "FileApproved": "File approved",
+      "FileRejected": "File rejected",
+      "CommentCreated": "Comment posted",
+      "CommentDeleted": "Comment deleted",
+      "ReportCreated": "Report",
+      "ReportResolved": "Report resolved",
+      "ReportDismissed": "Report dismissed",
+      "FileDeleted": "File deleted"
+    },
+    "reportReasons": {
+      "CorruptedFile": "Corrupted file",
+      "WrongMetadata": "Wrong details",
+      "Copyright": "Copyright",
+      "Other": "Other"
+    },
+    "reportStatuses": {
+      "Open": "Open",
+      "Resolved": "Resolved",
+      "Dismissed": "Dismissed"
+    }
+  },
+  "home": {
+    "badge": "USTHB student platform",
+    "heroTitle": "All of USTHB's knowledge, ",
+    "heroHighlight": "in one place.",
+    "heroText": "Your collaborative hub for academic resources — old exams, lecture notes, worksheets and more. Search, share, and learn with the USTHB community. 🚀",
+    "browseNow": "Browse now",
+    "contribute": "Contribute",
+    "stats": {
+      "resources": "Resources",
+      "majors": "Majors",
+      "modules": "Modules",
+      "contributors": "Contributors"
+    },
+    "browseByType": "Browse by type",
+    "viewAll": "View all",
+    "howItWorks": "How it works",
+    "steps": {
+      "browse": {
+        "title": "Browse",
+        "text": "Filter by major, module, type, level and year to find exactly what you need."
+      },
+      "contribute": {
+        "title": "Contribute",
+        "text": "Share your lectures, worksheets and past exams in a few clicks, with full metadata."
+      },
+      "reviewed": {
+        "title": "Reviewed",
+        "text": "Every submission is checked by a moderator before it's published to the community."
+      }
+    },
+    "browseByMajor": "Browse by major",
+    "recentUploads": "Recent uploads",
+    "empty": "No resources published yet. Be the first to contribute!",
+    "contributeResource": "Contribute a resource"
+  },
+  "browse": {
+    "showing": "Showing {start}–{end} of {total, plural, one {# result} other {# results}}",
+    "noFiles": "No files found..."
+  },
+  "filters": {
+    "title": "Filters",
+    "clearAll": "Clear all",
+    "toggle": "Show or hide filters",
+    "selected": "{count} selected",
+    "major": "Major",
+    "selectMajor": "Select major...",
+    "searchMajor": "Search major...",
+    "noMajor": "No major found.",
+    "level": "Academic level",
+    "selectLevels": "Select levels...",
+    "searchLevels": "Search levels...",
+    "noLevel": "No level found.",
+    "sectionGroup": "Section & group",
+    "section": "Section",
+    "sectionPlaceholder": "Enter section...",
+    "group": "Group",
+    "groupPlaceholder": "Enter group...",
+    "year": "Academic year",
+    "startYear": "Start year",
+    "endYear": "End year",
+    "yearTo": "to",
+    "semester": "Semester",
+    "module": "Module",
+    "selectModules": "Select modules...",
+    "searchModules": "Search modules...",
+    "noModule": "No module found.",
+    "professor": "Professor",
+    "selectProfessors": "Select professors...",
+    "searchProfessors": "Search professors...",
+    "noProfessor": "No professor found.",
+    "type": "File type",
+    "language": "Language",
+    "apply": "Apply filters"
+  },
+  "contribute": {
+    "title": "Upload a resource",
+    "major": "Major",
+    "majorPlaceholder": "Select or type a major...",
+    "majorSearch": "Search majors...",
+    "majorEmpty": "No major found.",
+    "level": "Academic level",
+    "levelPlaceholder": "Select academic level",
+    "section": "Section",
+    "sectionPlaceholder": "e.g., A",
+    "group": "Group (optional)",
+    "groupPlaceholder": "e.g., 1",
+    "year": "Academic year",
+    "yearPlaceholder": "e.g., 2024/2025",
+    "semester": "Semester",
+    "semesterPlaceholder": "Select semester",
+    "module": "Module",
+    "modulePlaceholder": "Select or type a module...",
+    "moduleSearch": "Search modules...",
+    "moduleEmpty": "No module found.",
+    "professor": "Professor",
+    "professorPlaceholder": "Select or type a professor...",
+    "professorSearch": "Search professors...",
+    "professorEmpty": "No professor found.",
+    "comboboxSelect": "Select",
+    "type": "Resource type",
+    "typePlaceholder": "Select type",
+    "language": "Document language",
+    "languagePlaceholder": "Select language",
+    "fileHint": "Click to upload a PDF (max {maxFileSizeMb} MB)",
+    "fileTooLarge": "File must be {maxFileSizeMb} MB or smaller.",
+    "anonymous": "Publish anonymously",
+    "anonymousHelp": "Your name won't be shown publicly. Moderators can still see who submitted the file.",
+    "submit": "Submit",
+    "uploading": "Uploading...",
+    "success": "File uploaded! It will be published once reviewed."
+  },
+  "submissions": {
+    "title": "Submissions review",
+    "subtitle": "Approve or reject files sent by contributors",
+    "columns": {
+      "type": "Type",
+      "module": "Module",
+      "major": "Major",
+      "level": "Level",
+      "year": "Year",
+      "semester": "Semester",
+      "section": "Section",
+      "professor": "Professor",
+      "language": "Language",
+      "uploadedBy": "Uploaded by"
+    },
+    "anonymous": "Anonymous",
+    "approve": "Approve",
+    "reject": "Reject",
+    "open": "Open in Drive",
+    "approved": "File approved.",
+    "rejected": "File rejected.",
+    "approveFailed": "Failed to approve the file.",
+    "rejectFailed": "Failed to reject the file.",
+    "empty": "No pending files",
+    "emptyHint": "All files have been reviewed."
+  },
+  "pagination": {
+    "label": "Pagination",
+    "previous": "Previous",
+    "next": "Next",
+    "goPrevious": "Go to previous page",
+    "goNext": "Go to next page",
+    "morePages": "More pages",
+    "rowsPerPage": "Rows per page"
+  },
+  "resourceCard": {
+    "download": "Download",
+    "details": "Details:",
+    "major": "Major:",
+    "professor": "Professor:"
+  },
+  "file": {
+    "back": "Back to resources",
+    "download": "Download",
+    "openInDrive": "Open in Drive",
+    "preview": "Preview: {title}",
+    "details": "Details",
+    "fields": {
+      "major": "Major",
+      "module": "Module",
+      "professor": "Professor",
+      "level": "Level",
+      "year": "Academic year",
+      "semester": "Semester",
+      "section": "Section",
+      "group": "Group",
+      "language": "Language",
+      "addedOn": "Added on"
+    },
+    "sharedBy": "Shared by <b>{name}</b>",
+    "sharedAnonymously": "Shared anonymously"
+  },
+  "comments": {
+    "title": "Comments ({count})",
+    "empty": "No comments yet.",
+    "placeholder": "A remark, a correction, a thank-you?",
+    "label": "Your comment",
+    "publish": "Post",
+    "published": "Comment posted.",
+    "loginPrompt": "<link>Log in</link> to leave a comment.",
+    "delete": "Delete comment",
+    "deleteTitle": "Delete this comment?",
+    "deleteDescription": "This can't be undone.",
+    "cancel": "Cancel",
+    "confirmDelete": "Delete",
+    "deleted": "Comment deleted.",
+    "deleteFailed": "Couldn't delete the comment."
+  },
+  "report": {
+    "trigger": "Report a problem",
+    "title": "Report a problem",
+    "description": "Your report will be reviewed by the moderation team.",
+    "reason": "Reason",
+    "reasonPlaceholder": "Choose a reason",
+    "details": "Details",
+    "detailsPlaceholder": "Describe the problem (required for \"Other\")",
+    "submit": "Send",
+    "sent": "Thanks! Your report has been sent to the moderators."
+  },
+  "admin": {
+    "title": "Administration",
+    "sections": {
+      "dashboard": "Dashboard",
+      "reports": "Reports",
+      "logs": "Activity log"
+    }
+  },
+  "dashboard": {
+    "tiles": {
+      "files": "Published files",
+      "pendingFiles": "Pending submissions",
+      "openReports": "Open reports",
+      "users": "Registered users",
+      "recentDownloads": "Downloads (30 days)",
+      "comments": "Comments"
+    },
+    "downloadsPerDay": "Downloads per day",
+    "submissionsPerDay": "Submissions per day",
+    "topFiles": "Most downloaded files",
+    "noDownloads": "No downloads yet.",
+    "topContributors": "Most active contributors",
+    "noFiles": "No published files yet.",
+    "fileCount": "{count, plural, one {# file} other {# files}}"
+  },
+  "chart": {
+    "total": "{total} over {days} days",
+    "units": {
+      "downloads": "{count, plural, one {# download} other {# downloads}}",
+      "submissions": "{count, plural, one {# submission} other {# submissions}}"
+    },
+    "columnLabel": "{day}: {value}",
+    "showData": "Show data",
+    "day": "Day",
+    "count": "Count"
+  },
+  "logs": {
+    "title": "Activity log",
+    "subtitle": "Sign-ins and moderation actions ({count, plural, one {# entry} other {# entries}})",
+    "allEvents": "All events",
+    "filterLabel": "Filter by event type",
+    "columns": {
+      "date": "Date",
+      "event": "Event",
+      "user": "User",
+      "details": "Details"
+    },
+    "empty": "No events",
+    "emptyHint": "Nothing has been recorded for this filter yet."
+  },
+  "events": {
+    "anonymous": "anonymous",
+    "moderated": "by a moderator"
+  },
+  "reports": {
+    "title": "Reports",
+    "subtitle": "Problems reported by users on published files",
+    "allStatuses": "All statuses",
+    "filterLabel": "Filter by status",
+    "columns": {
+      "date": "Date",
+      "file": "File",
+      "reason": "Reason",
+      "reporter": "Reported by",
+      "status": "Status"
+    },
+    "deletedFile": "{file} (deleted)",
+    "handledBy": "by {name}, on {date}",
+    "handledOn": "on {date}",
+    "resolve": "Resolve",
+    "dismiss": "Dismiss",
+    "deleteFile": "Delete file",
+    "deleteTitle": "Delete this file?",
+    "deleteDescription": "The file will be removed from the site and from Google Drive, along with its comments. Its open reports will be marked as resolved. This can't be undone.",
+    "cancel": "Cancel",
+    "confirmDelete": "Delete",
+    "resolved": "Report resolved.",
+    "dismissed": "Report dismissed.",
+    "fileDeleted": "File deleted.",
+    "resolveFailed": "Couldn't resolve the report.",
+    "dismissFailed": "Couldn't dismiss the report.",
+    "deleteFailed": "Couldn't delete the file.",
+    "empty": "No reports",
+    "emptyHint": "Nothing to handle for this filter."
+  },
+  "login": {
+    "title": "Welcome back",
+    "subtitle": "Sign in to your account",
+    "google": "Log in with Google",
+    "terms": "By continuing, you agree to our <terms>Terms of Service</terms> and <privacy>Privacy Policy</privacy>."
+  },
+  "notFound": {
+    "title": "Page not found",
+    "text": "The page you're looking for doesn't exist or has moved.",
+    "back": "Back to home"
+  },
+  "errors": {
+    "selectOption": "Please select an option.",
+    "invalidOption": "Please select a valid option.",
+    "academicYearFormat": "Academic year must be in format YYYY/YYYY.",
+    "academicYearConsecutive": "The second year must be the first year plus one.",
+    "fileRequired": "Please provide a file.",
+    "pdfOnly": "Only PDF files are allowed.",
+    "fileTooLarge": "File must be {maxFileSizeMb} MB or smaller.",
+    "commentEmpty": "The comment is empty.",
+    "commentTooLong": "Comments can't be longer than {commentMaxLength} characters.",
+    "reasonRequired": "Please choose a reason.",
+    "detailsRequired": "Please describe the problem.",
+    "detailsTooLong": "Details can't be longer than {reportDetailsMaxLength} characters.",
+    "fileGone": "This file no longer exists.",
+    "alreadyReported": "You've already reported this file. Your report is being reviewed.",
+    "invalid": "Invalid value.",
+    "unexpected": "Something went wrong. Please try again."
+  }
+}

@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { ComponentPropsWithoutRef } from "react";
 import {
   ArrowRight,
@@ -20,7 +19,9 @@ import { buttonVariants } from "@/components/ui/button";
 import { getFileStats, getRecentFiles } from "@/dal/files";
 import { getCurrentUser } from "@/dal/session";
 import { getMajors } from "@/dal/taxonomy";
-import { cn, fileTypeLabels } from "@/lib/utils";
+import { Link } from "@/i18n/navigation";
+import { cn } from "@/lib/utils";
+import { getTranslations } from "next-intl/server";
 import { FileType } from "@prisma/client";
 
 const TYPE_ICONS: Record<FileType, typeof BookOpen> = {
@@ -33,40 +34,30 @@ const TYPE_ICONS: Record<FileType, typeof BookOpen> = {
 };
 
 const STEPS = [
-  {
-    icon: Search,
-    title: "Browse",
-    text: "Filter by major, module, type, level and year to find exactly what you need.",
-  },
-  {
-    icon: UploadCloud,
-    title: "Contribute",
-    text: "Share your lectures, worksheets and past exams in a few clicks, with full metadata.",
-  },
-  {
-    icon: ShieldCheck,
-    title: "Reviewed",
-    text: "Every submission is checked by a moderator before it's published to the community.",
-  },
-];
+  { key: "browse", icon: Search },
+  { key: "contribute", icon: UploadCloud },
+  { key: "reviewed", icon: ShieldCheck },
+] as const;
 
 function Section({ className, ...props }: ComponentPropsWithoutRef<"section">) {
   return <section className={cn("max-w-[1200px] w-full m-auto px-4", className)} {...props} />;
 }
 
 export default async function Home() {
-  const [user, stats, majors, recent] = await Promise.all([
+  const [user, stats, majors, recent, t, tTypes] = await Promise.all([
     getCurrentUser(),
     getFileStats(),
     getMajors(),
     getRecentFiles(6),
+    getTranslations("home"),
+    getTranslations("enums.fileTypes"),
   ]);
 
   const statItems = [
-    { label: "Resources", value: stats.resources, icon: Library },
-    { label: "Majors", value: stats.majors, icon: GraduationCap },
-    { label: "Modules", value: stats.modules, icon: BookOpen },
-    { label: "Contributors", value: stats.contributors, icon: Users },
+    { label: t("stats.resources"), value: stats.resources, icon: Library },
+    { label: t("stats.majors"), value: stats.majors, icon: GraduationCap },
+    { label: t("stats.modules"), value: stats.modules, icon: BookOpen },
+    { label: t("stats.contributors"), value: stats.contributors, icon: Users },
   ];
 
   return (
@@ -75,25 +66,24 @@ export default async function Home() {
       <Section className="flex flex-col items-center gap-6 text-center">
         <Badge variant="secondary" className="gap-1">
           <GraduationCap className="size-3.5" />
-          USTHB student platform
+          {t("badge")}
         </Badge>
         <h1 className="max-w-3xl text-5xl font-extrabold tracking-tight sm:text-6xl">
-          {"All of USTHB's knowledge, "}
-          <span className="text-primary">in one place.</span>
+          {t("heroTitle")}
+          <span className="text-primary">{t("heroHighlight")}</span>
         </h1>
         <p className="max-w-2xl text-lg text-muted-foreground">
-          Your collaborative hub for academic resources — old exams, lecture notes, worksheets and
-          more. Search, share, and learn with the USTHB community. 🚀
+          {t("heroText")}
         </p>
         <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
           <Link href="/browse" className={buttonVariants({ size: "lg" })}>
-            Browse Now
+            {t("browseNow")}
           </Link>
           <Link
             href={user ? "/contribute" : "/login"}
             className={buttonVariants({ variant: "secondary", size: "lg" })}
           >
-            Contribute
+            {t("contribute")}
           </Link>
         </div>
       </Section>
@@ -115,12 +105,12 @@ export default async function Home() {
       {/* Browse by type */}
       <Section className="flex flex-col gap-6">
         <div className="flex items-end justify-between">
-          <h2 className="text-2xl font-bold">Browse by type</h2>
+          <h2 className="text-2xl font-bold">{t("browseByType")}</h2>
           <Link
             href="/browse"
             className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
           >
-            View all <ArrowRight className="size-4" />
+            {t("viewAll")} <ArrowRight className="size-4" />
           </Link>
         </div>
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
@@ -135,7 +125,7 @@ export default async function Home() {
                 <span className="flex size-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
                   <Icon className="size-5" />
                 </span>
-                <span className="font-medium">{fileTypeLabels[type]}</span>
+                <span className="font-medium">{tTypes(type)}</span>
               </Link>
             );
           })}
@@ -145,17 +135,17 @@ export default async function Home() {
       {/* How it works */}
       <div className="bg-muted/40 py-12">
         <Section className="flex flex-col gap-8">
-          <h2 className="text-center text-2xl font-bold">How it works</h2>
+          <h2 className="text-center text-2xl font-bold">{t("howItWorks")}</h2>
           <div className="grid gap-6 md:grid-cols-3">
-            {STEPS.map(({ icon: Icon, title, text }, i) => (
-              <div key={title} className="flex flex-col items-center gap-3 text-center">
+            {STEPS.map(({ key, icon: Icon }, i) => (
+              <div key={key} className="flex flex-col items-center gap-3 text-center">
                 <span className="flex size-12 items-center justify-center rounded-full bg-primary text-primary-foreground">
                   <Icon className="size-6" />
                 </span>
                 <h3 className="font-semibold">
-                  {i + 1}. {title}
+                  {i + 1}. {t(`steps.${key}.title`)}
                 </h3>
-                <p className="text-sm text-muted-foreground">{text}</p>
+                <p className="text-sm text-muted-foreground">{t(`steps.${key}.text`)}</p>
               </div>
             ))}
           </div>
@@ -165,7 +155,7 @@ export default async function Home() {
       {/* Browse by major */}
       {majors.length > 0 && (
         <Section className="flex flex-col gap-6">
-          <h2 className="text-2xl font-bold">Browse by major</h2>
+          <h2 className="text-2xl font-bold">{t("browseByMajor")}</h2>
           <div className="flex flex-wrap gap-2">
             {majors.map((major) => (
               <Link
@@ -182,7 +172,7 @@ export default async function Home() {
 
       {/* Recent uploads */}
       <Section className="flex flex-col gap-6">
-        <h2 className="text-2xl font-bold">Recent uploads</h2>
+        <h2 className="text-2xl font-bold">{t("recentUploads")}</h2>
         {recent.length > 0 ? (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {recent.map((file) => (
@@ -193,10 +183,10 @@ export default async function Home() {
           <div className="flex flex-col items-center gap-4 rounded-2xl border border-dashed p-12 text-center">
             <Library className="size-8 text-muted-foreground" />
             <p className="text-muted-foreground">
-              No resources published yet. Be the first to contribute!
+              {t("empty")}
             </p>
             <Link href={user ? "/contribute" : "/login"} className={buttonVariants()}>
-              Contribute a resource
+              {t("contributeResource")}
             </Link>
           </div>
         )}
